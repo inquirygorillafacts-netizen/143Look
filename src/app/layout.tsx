@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Poppins, PT_Sans } from 'next/font/google';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
   title: '143look',
@@ -39,12 +40,14 @@ export default function RootLayout({
           fontPtSans.variable
         )}
       >
-        <div className="relative flex flex-col h-full">
-          <Header />
-          <main className="flex-grow flex flex-col">{children}</main>
-          <Footer />
-        </div>
-        <Toaster />
+        <FirebaseClientProvider>
+          <div className="relative flex flex-col h-full">
+            <Header />
+            <main className="flex-grow flex flex-col">{children}</main>
+            <Footer />
+          </div>
+          <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );

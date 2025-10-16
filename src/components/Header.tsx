@@ -1,7 +1,19 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { LoginDialog } from '@/components/LoginDialog';
+import { useUser } from '@/firebase';
+import { getAuth, signOut } from 'firebase/auth';
 
 const Header = () => {
+  const { user, isUserLoading } = useUser();
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    signOut(auth);
+  };
+
   return (
     <header className="w-full py-6 px-4 md:px-8 z-10 bg-background/80 backdrop-blur-sm sticky top-0 border-b border-border/20">
       <nav className="max-w-6xl mx-auto flex justify-between items-center">
@@ -10,15 +22,32 @@ const Header = () => {
           className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
         >
           <div className="text-3xl font-black tracking-tighter">
-            <span className="font-poppins font-light text-primary">1</span>
-            <span className="font-poppins font-bold text-primary">4</span>
-            <span className="font-poppins font-normal italic text-primary">3</span>
+            <span className="font-poppins font-thin text-primary">1</span>
+            <span className="font-poppins font-black text-primary text-4xl mx-[-0.2rem]">
+              4
+            </span>
+            <span className="font-poppins font-normal italic text-primary text-2xl">
+              3
+            </span>
             <span className="text-foreground">look</span>
           </div>
         </Link>
-        <Link href="/analytics" passHref>
-          <Button variant="ghost">Analytics</Button>
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/analytics" passHref>
+            <Button variant="ghost">Analytics</Button>
+          </Link>
+          {isUserLoading ? (
+            <Button variant="ghost" disabled>
+              Loading...
+            </Button>
+          ) : user ? (
+            <Button variant="ghost" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <LoginDialog />
+          )}
+        </div>
       </nav>
     </header>
   );
