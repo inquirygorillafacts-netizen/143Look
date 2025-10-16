@@ -4,7 +4,7 @@ import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Loader } from 'lucide-react';
+import { Loader, Home } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -56,12 +56,18 @@ export default function AdminLayout({
     <div className="flex min-h-screen w-full">
       <aside className="hidden w-64 flex-col border-r bg-background p-4 sm:flex">
         <nav className="flex flex-col gap-2">
-          <h3 className="font-semibold tracking-tight">Admin Menu</h3>
+          <h3 className="font-semibold tracking-tight mb-2">Admin Menu</h3>
           <Link href="/admin/analytics" passHref>
              <Button variant="ghost" className="w-full justify-start">Analytics</Button>
           </Link>
           <Link href="/admin/reels" passHref>
              <Button variant="ghost" className="w-full justify-start">Manage Reels</Button>
+          </Link>
+           <Link href="/" passHref>
+             <Button variant="outline" className="w-full justify-start mt-4">
+                <Home className="mr-2 h-4 w-4" />
+                Back to Home
+             </Button>
           </Link>
         </nav>
       </aside>
