@@ -22,7 +22,7 @@ export function LoginDialog() {
       await signInWithPopup(auth, provider);
       toast({
         title: 'Login Successful',
-        description: 'Welcome back!',
+        description: 'Welcome!',
       });
     } catch (error: any) {
       console.error('Login failed:', error);
@@ -42,10 +42,10 @@ export function LoginDialog() {
       <DialogContent className="sm:max-w-[425px] bg-card border-border">
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold">
-            Owner Access
+            Login
           </DialogTitle>
           <DialogDescription className="text-center text-muted-foreground pt-2">
-            This login is restricted to the application owner only.
+            Login or sign up to continue.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -68,7 +68,7 @@ export function LoginDialog() {
                 d="M488 261.8C488 403.3 381.5 512 244 512 111.8 512 0 400.2 0 261.8S111.8 11.6 244 11.6c67.8 0 120.4 26.2 165.6 68.5l-63.1 61.9c-35.4-33.8-82-61.9-102.5-61.9-88.4 0-160.2 71.8-160.2 160.2s71.8 160.2 160.2 160.2c94.2 0 135.3-65.1 141.9-98.6H244v-73.6h244c2.6 13.7 4.1 29.5 4.1 46.4z"
               ></path>
             </svg>
-            Login with Google
+            Continue with Google
           </Button>
         </div>
       </DialogContent>
