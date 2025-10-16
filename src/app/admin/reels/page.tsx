@@ -91,6 +91,13 @@ export default function ReelsPage() {
       toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all fields.' });
       return;
     }
+    
+    try {
+        new URL(productUrl);
+    } catch (_) {
+        toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid product URL.' });
+        return;
+    }
 
     setIsSaving(true);
     
