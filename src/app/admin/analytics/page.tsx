@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BarChart, CreditCard, TrendingUp, Users, Loader } from 'lucide-react';
 import {
   Card,
@@ -23,7 +23,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
-import { useFirestore } from '@/firebase';
+import { useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { collection, getDocs, collectionGroup, query } from 'firebase/firestore';
 
 const chartConfig = {
@@ -55,18 +55,37 @@ export default function AnalyticsPage() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
   const [kpiData, setKpiData] = useState<KpiData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     async function fetchData() {
       if (!firestore) return;
       setIsLoading(true);
+      setError(null);
+
+      const reelsCollection = collection(firestore, 'reels');
+      const analyticsEventsCollectionGroup = collectionGroup(firestore, 'analytics_events');
+
+      const reelsQuerySnapshotPromise = getDocs(reelsCollection).catch(e => {
+        const contextualError = new FirestorePermissionError({ operation: 'list', path: 'reels'});
+        errorEmitter.emit('permission-error', contextualError);
+        throw contextualError;
+      });
+
+      const analyticsSnapshotPromise = getDocs(analyticsEventsCollectionGroup).catch(e => {
+        const contextualError = new FirestorePermissionError({ operation: 'list', path: 'analytics_events (collectionGroup)'});
+        errorEmitter.emit('permission-error', contextualError);
+        throw contextualError;
+      });
 
       try {
-        const reelsQuerySnapshot = await getDocs(collection(firestore, 'reels'));
-        const reels = reelsQuerySnapshot.docs.map(doc => ({ id: doc.id, reelNumber: doc.data().reelNumber as string }));
+        const [reelsQuerySnapshot, analyticsSnapshot] = await Promise.all([
+          reelsQuerySnapshotPromise,
+          analyticsSnapshotPromise
+        ]);
 
-        const analyticsEventsQuery = query(collectionGroup(firestore, 'analytics_events'));
-        const analyticsSnapshot = await getDocs(analyticsEventsQuery);
+        const reels = reelsQuerySnapshot.docs.map(doc => ({ id: doc.id, reelNumber: doc.data().reelNumber as string }));
         
         const analyticsByReel: { [key: string]: { searches: number; clicks: number } } = {};
 
@@ -113,8 +132,13 @@ export default function AnalyticsPage() {
           mostPopularReel,
         });
 
-      } catch (error) {
-        console.error("Error fetching analytics data: ", error);
+      } catch (err) {
+        if (err instanceof FirestorePermissionError) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred while fetching analytics data.");
+          console.error(err);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -128,6 +152,15 @@ export default function AnalyticsPage() {
       <div className="flex h-full w-full items-center justify-center">
         <Loader className="h-8 w-8 animate-spin" />
         <p className="ml-2">Loading Analytics...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center text-center">
+        <h1 className="text-2xl font-bold text-destructive">Error Loading Analytics</h1>
+        <p className="text-muted-foreground max-w-lg">{error}</p>
       </div>
     );
   }
@@ -148,7 +181,6 @@ export default function AnalyticsPage() {
             <div className="text-2xl font-bold">
               {kpiData?.totalSearches.toLocaleString() ?? 0}
             </div>
-            <p className="text-xs text-muted-foreground">in the last 30 days</p>
           </CardContent>
         </Card>
         <Card>
@@ -160,7 +192,6 @@ export default function AnalyticsPage() {
             <div className="text-2xl font-bold">
               {kpiData?.totalClicks.toLocaleString() ?? 0}
             </div>
-            <p className="text-xs text-muted-foreground">successful redirects</p>
           </CardContent>
         </Card>
         <Card>
@@ -172,7 +203,6 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{kpiData?.ctr ?? '0.0'}%</div>
-            <p className="text-xs text-muted-foreground">from total searches</p>
           </CardContent>
         </Card>
         <Card>
@@ -184,7 +214,6 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">#{kpiData?.mostPopularReel ?? '-'}</div>
-            <p className="text-xs text-muted-foreground">highest click count</p>
           </CardContent>
         </Card>
       </div>

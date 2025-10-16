@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, where, getDocs, Timestamp, addDoc } from 'firebase/firestore';
+import { useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { collection, query, where, getDocs, Timestamp, addDoc, doc } from 'firebase/firestore';
 import { Copy, Share2, ExternalLink, ArrowRight, Loader } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,11 +39,10 @@ export default function Home() {
     setIsLoading(true);
     setLink('');
 
-    try {
-      const reelsCollection = collection(firestore, 'reels');
-      const q = query(reelsCollection, where('reelNumber', '==', code));
-      const querySnapshot = await getDocs(q);
-      
+    const reelsCollection = collection(firestore, 'reels');
+    const q = query(reelsCollection, where('reelNumber', '==', code));
+    
+    getDocs(q).then(async (querySnapshot) => {
       let foundReel: Reel | null = null;
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
@@ -52,21 +51,26 @@ export default function Home() {
         
         // Log search event
         const analyticsCollection = collection(firestore, `reels/${foundReel.id}/analytics_events`);
-        await addDoc(analyticsCollection, {
+        const eventData = {
             eventType: 'reel_entry',
             eventTimestamp: Timestamp.now(),
+        };
+        addDoc(analyticsCollection, eventData).catch(e => {
+            const contextualError = new FirestorePermissionError({ operation: 'create', path: analyticsCollection.path, requestResourceData: eventData });
+            errorEmitter.emit('permission-error', contextualError);
         });
 
       } else {
         setLink('');
         setError('Invalid code. Please try again.');
       }
-    } catch (e) {
-      console.error(e);
-      setError('An error occurred while searching.');
-    } finally {
-      setIsLoading(false);
-    }
+    }).catch(e => {
+        const contextualError = new FirestorePermissionError({ operation: 'list', path: 'reels' });
+        errorEmitter.emit('permission-error', contextualError);
+        setError('An error occurred while searching. Check permissions.');
+    }).finally(() => {
+        setIsLoading(false);
+    });
   };
 
   const handleCopy = () => {
@@ -90,22 +94,27 @@ export default function Home() {
 
   const handleRedirect = async () => {
     if (link && firestore) {
-       try {
-        const reelsCollection = collection(firestore, 'reels');
-        const q = query(reelsCollection, where('productUrl', '==', link));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
+       const reelsCollection = collection(firestore, 'reels');
+       const q = query(reelsCollection, where('productUrl', '==', link));
+       
+       getDocs(q).then(async (querySnapshot) => {
+         if (!querySnapshot.empty) {
             const reelDoc = querySnapshot.docs[0];
-             const analyticsCollection = collection(firestore, `reels/${reelDoc.id}/analytics_events`);
-             await addDoc(analyticsCollection, {
+            const analyticsCollection = collection(firestore, `reels/${reelDoc.id}/analytics_events`);
+            const eventData = {
                 eventType: 'click_through',
                 eventTimestamp: Timestamp.now(),
+            };
+            addDoc(analyticsCollection, eventData).catch(e => {
+                const contextualError = new FirestorePermissionError({ operation: 'create', path: analyticsCollection.path, requestResourceData: eventData });
+                errorEmitter.emit('permission-error', contextualError);
             });
         }
-       } catch (e) {
-        console.error("Failed to log click event", e);
-       }
+       }).catch(e => {
+            // This might fail if listing reels is not allowed, but we still proceed with redirection.
+            console.warn("Could not log click event due to query permission error.");
+       });
+
       window.open(link, '_blank');
     }
   };
@@ -114,27 +123,27 @@ export default function Home() {
     <>
       <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
         <div className="z-10 flex flex-col items-center w-full">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3 text-foreground">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter mb-2 text-foreground">
             Find Your Look.
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-md mb-6 px-4">
+          <p className="text-sm text-muted-foreground max-w-sm mb-6 px-4">
             Saw something you loved in a Reel? Enter the code below to get the direct link to the product.
           </p>
 
-          <div className="flex w-full max-w-xs items-center space-x-2 mb-4 px-4">
+          <div className="flex w-full max-w-[280px] items-center space-x-2 mb-4">
             <Input
               type="text"
               placeholder="Enter Reel Code..."
               value={code}
               onChange={(e) => setCode(e.target.value.trim())}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="h-11 text-sm border-border focus:ring-primary text-center"
+              className="h-10 text-sm border-border focus:ring-primary text-center"
               disabled={isLoading}
             />
             <Button
               size="icon"
               onClick={handleSearch}
-              className="h-11 w-11 flex-shrink-0 bg-primary hover:bg-primary/90"
+              className="h-10 w-10 flex-shrink-0 bg-primary hover:bg-primary/90"
               disabled={isLoading}
             >
               {isLoading ? <Loader className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
@@ -144,7 +153,7 @@ export default function Home() {
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
           {link && (
-            <Card className="w-full max-w-xs mt-6 bg-card border-border/50 shadow-lg">
+            <Card className="w-full max-w-xs mt-4 bg-card border-border/50 shadow-lg">
               <CardContent className="p-3">
                 <p className="text-xs text-muted-foreground break-words mb-3 text-left p-2 bg-secondary rounded-md">
                   {link}
@@ -168,8 +177,8 @@ export default function Home() {
           )}
         </div>
       </div>
-       <div className="w-full flex flex-col items-center justify-center py-12 md:py-20 bg-secondary">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-foreground">
+       <div className="w-full flex flex-col items-center justify-center py-12 md:py-16 bg-secondary">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-foreground">
           What Our Users Say
         </h2>
         <InfiniteMovingCards

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc, setDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
+import { useState, useMemo, useCallback } from 'react';
+import { useCollection, useFirestore, useMemoFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { collection, doc, setDoc, deleteDoc, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -73,12 +73,26 @@ export default function ReelsPage() {
     setIsDialogOpen(true);
   };
   
-  const handleDelete = async (reelId: string) => {
+  const handleDelete = async (reelId: string, reelNum: string) => {
     if (!firestore) return;
-    if (confirm('Are you sure you want to delete this reel?')) {
-      const docRef = doc(firestore, 'reels', reelId);
-      await deleteDoc(docRef);
-      toast({ title: 'Reel Deleted', description: 'The reel has been successfully deleted.' });
+    if (confirm(`Are you sure you want to delete reel #${reelNum}? This will also delete its analytics data.`)) {
+      const reelDocRef = doc(firestore, 'reels', reelId);
+      
+      deleteDoc(reelDocRef).then(async () => {
+          const analyticsSubcollection = collection(firestore, 'reels', reelId, 'analytics_events');
+          const analyticsSnapshot = await getDocs(analyticsSubcollection);
+          const batch = writeBatch(firestore);
+          analyticsSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+          
+          toast({ title: 'Reel Deleted', description: `Reel #${reelNum} and its analytics have been deleted.` });
+      }).catch(error => {
+          const contextualError = new FirestorePermissionError({ operation: 'delete', path: reelDocRef.path });
+          errorEmitter.emit('permission-error', contextualError);
+          toast({ variant: 'destructive', title: 'Error', description: 'Could not delete reel. Check permissions.' });
+      });
     }
   };
 
@@ -101,10 +115,20 @@ export default function ReelsPage() {
 
     setIsSaving(true);
     
-    // Check for duplicate reelNumber unless we are editing the same reel
     const isEditing = !!currentReel?.id;
     const q = query(reelsCollection, where('reelNumber', '==', reelNumber));
-    const querySnapshot = await getDocs(q);
+    
+    const querySnapshot = await getDocs(q).catch(e => {
+        const contextualError = new FirestorePermissionError({ operation: 'list', path: 'reels'});
+        errorEmitter.emit('permission-error', contextualError);
+        return null;
+    });
+
+    if (!querySnapshot) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not verify reel number. Check permissions.' });
+        setIsSaving(false);
+        return;
+    }
 
     if (!querySnapshot.empty) {
         const isSameDoc = isEditing && querySnapshot.docs[0].id === currentReel.id;
@@ -121,21 +145,26 @@ export default function ReelsPage() {
        docRef = doc(firestore, 'reels', currentReel!.id!);
        newReelId = currentReel!.id!;
     } else {
-       // For new reels, create a new doc reference
        docRef = doc(collection(firestore, 'reels'));
        newReelId = docRef.id;
     }
 
-    try {
-        await setDoc(docRef, { id: newReelId, reelNumber, productUrl }, { merge: true });
+    const reelData = { id: newReelId, reelNumber, productUrl };
+
+    setDoc(docRef, reelData, { merge: true }).then(() => {
         toast({ title: 'Success', description: `Reel ${isEditing ? 'updated' : 'created'} successfully.` });
         setIsDialogOpen(false);
-    } catch(e) {
-        console.error("Error saving reel: ", e);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to save reel.' });
-    } finally {
+    }).catch(error => {
+        const contextualError = new FirestorePermissionError({ 
+            operation: isEditing ? 'update' : 'create', 
+            path: docRef.path,
+            requestResourceData: reelData
+        });
+        errorEmitter.emit('permission-error', contextualError);
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to save reel. Check permissions.' });
+    }).finally(() => {
         setIsSaving(false);
-    }
+    });
   };
 
 
@@ -151,14 +180,14 @@ export default function ReelsPage() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{currentReel ? 'Edit Reel' : 'Add New Reel'}</DialogTitle>
+              <DialogTitle>{currentReel ? `Edit Reel #${currentReel.reelNumber}` : 'Add New Reel'}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Input
                 placeholder="Reel Number"
                 value={reelNumber}
                 onChange={(e) => setReelNumber(e.target.value)}
-                disabled={isSaving || !!currentReel} // Disable if saving or editing
+                disabled={isSaving || !!currentReel} 
               />
               <Input
                 placeholder="Product URL"
@@ -197,7 +226,7 @@ export default function ReelsPage() {
             <TableBody>
               {sortedReels?.map((reel) => (
                 <TableRow key={reel.id}>
-                  <TableCell>{reel.reelNumber}</TableCell>
+                  <TableCell>#{reel.reelNumber}</TableCell>
                   <TableCell>
                     <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate block max-w-xs">
                       {reel.productUrl}
@@ -207,7 +236,7 @@ export default function ReelsPage() {
                     <Button variant="ghost" size="icon" onClick={() => handleEdit(reel)}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(reel.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(reel.id, reel.reelNumber)}>
                       <Trash className="h-4 w-4" />
                     </Button>
                   </TableCell>
