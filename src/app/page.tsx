@@ -79,14 +79,21 @@ export default function Home() {
     });
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (navigator.share) {
-      navigator.share({
-        title: 'Check out this look on 143look',
-        text: 'I found this product from a Reel using 143look! You can try it too.',
-        url: link,
-      });
+      try {
+        await navigator.share({
+          title: 'Check out this look on 143look',
+          text: 'I found this product from a Reel using 143look! You can try it too.',
+          url: link,
+        });
+      } catch (err) {
+        // If sharing fails, fall back to copying.
+        console.error('Share failed:', err);
+        handleCopy();
+      }
     } else {
+      // If navigator.share is not supported, fall back to copying.
       handleCopy();
     }
   };
