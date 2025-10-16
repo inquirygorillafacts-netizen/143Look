@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useCollection, useFirestore } from '@/firebase';
+import { useState } from 'react';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,11 +33,8 @@ interface Reel {
 
 export default function ReelsPage() {
   const firestore = useFirestore();
-  const reelsCollection = useMemo(() => firestore ? collection(firestore, 'reels') : null, [firestore]);
+  const reelsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'reels') : null, [firestore]);
   
-  if(reelsCollection) {
-      (reelsCollection as any).__memo = true;
-  }
   const { data: reels, isLoading } = useCollection<Reel>(reelsCollection);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);

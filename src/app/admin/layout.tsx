@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -17,15 +17,10 @@ export default function AdminLayout({
   const firestore = useFirestore();
   const router = useRouter();
 
-  const ownerDocRef =
-    user && firestore ? doc(firestore, 'owners', user.uid) : null;
-
-  // useDoc will crash if the ref is not memoized, but for this simple case
-  // where we are just checking for existence, we can skip memoization.
-  // A real app should use useMemoFirebase
-  if (ownerDocRef) {
-    (ownerDocRef as any).__memo = true;
-  }
+  const ownerDocRef = useMemoFirebase(
+    () => (user && firestore ? doc(firestore, 'owners', user.uid) : null),
+    [user, firestore]
+  );
   
   const { data: owner, isLoading: isOwnerLoading } = useDoc(ownerDocRef);
 
