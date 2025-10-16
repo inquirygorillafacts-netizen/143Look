@@ -268,8 +268,8 @@ export default function ReelsPage() {
                 </Button>
                 <Input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageSelection} disabled={isSaving}/>
                 {productImageUrl && (
-                  <div className="relative aspect-square w-full max-w-[150px] mx-auto border rounded-md overflow-hidden">
-                     <Image src={productImageUrl} alt="Product Preview" fill style={{objectFit: 'cover'}}/>
+                  <div className="relative w-[150px] h-[150px] mx-auto border rounded-md overflow-hidden">
+                     <Image src={productImageUrl} alt="Product Preview" layout="fill" objectFit="cover"/>
                   </div>
                 )}
               </div>

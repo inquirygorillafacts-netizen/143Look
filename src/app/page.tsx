@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -174,8 +175,8 @@ export default function Home() {
                 <Image
                   src={imageUrl}
                   alt="Product Image"
-                  fill
-                  style={{ objectFit: 'cover' }}
+                  layout="fill"
+                  objectFit="cover"
                   sizes="(max-width: 640px) 100vw, 384px"
                 />
               </div>
