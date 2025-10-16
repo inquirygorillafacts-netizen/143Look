@@ -1,6 +1,8 @@
+
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { useCollection, useFirestore, useMemoFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { collection, doc, setDoc, deleteDoc, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
@@ -24,7 +26,7 @@ import {
   DialogDescription
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash, Loader } from 'lucide-react';
+import { Plus, Edit, Trash, Loader, Upload } from 'lucide-react';
 
 interface Reel {
   id: string;
@@ -32,6 +34,8 @@ interface Reel {
   productUrl: string;
   productImageUrl: string;
 }
+
+const IMGBB_API_KEY = '43d1267c74925ed8af33485644bfaa6b';
 
 export default function ReelsPage() {
   const firestore = useFirestore();
@@ -41,6 +45,7 @@ export default function ReelsPage() {
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [currentReel, setCurrentReel] = useState<Partial<Reel> | null>(null);
   const [reelNumber, setReelNumber] = useState('');
   const [productUrl, setProductUrl] = useState('');
@@ -57,7 +62,7 @@ export default function ReelsPage() {
     if (!sortedReels || sortedReels.length === 0) {
       return '1';
     }
-    const highestReelNumber = Math.max(...sortedReels.map(r => parseInt(r.reelNumber, 10)));
+    const highestReelNumber = Math.max(...sortedReels.map(r => parseInt(r.reelNumber, 10) || 0));
     return (highestReelNumber + 1).toString();
   }, [sortedReels]);
 
@@ -101,13 +106,42 @@ export default function ReelsPage() {
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setProductImageUrl(result.data.url);
+        toast({ title: 'Success', description: 'Image uploaded successfully.' });
+      } else {
+        throw new Error(result.error?.message || 'Failed to upload image.');
+      }
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Upload Error', description: error.message || 'An unknown error occurred.' });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+
   const handleSave = async () => {
     if (!firestore || !reelsCollection) {
       toast({ variant: 'destructive', title: 'Error', description: 'Database not ready.' });
       return;
     }
     if (!reelNumber || !productUrl || !productImageUrl) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all fields.' });
+      toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all fields, including the product image.' });
       return;
     }
     
@@ -120,7 +154,7 @@ export default function ReelsPage() {
      try {
         new URL(productImageUrl);
     } catch (_) {
-        toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid product image URL.' });
+        toast({ variant: 'destructive', title: 'Invalid URL', description: 'The uploaded image URL is invalid.' });
         return;
     }
 
@@ -193,7 +227,7 @@ export default function ReelsPage() {
             <DialogHeader>
               <DialogTitle>{currentReel ? `Edit Reel ${currentReel.reelNumber}` : 'Add New Reel'}</DialogTitle>
                <DialogDescription>
-                Add or edit a reel number and its corresponding product URL.
+                Add or edit a reel number and its corresponding product URL and image.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -208,23 +242,30 @@ export default function ReelsPage() {
                 placeholder="Product URL"
                 value={productUrl}
                 onChange={(e) => setProductUrl(e.target.value)}
-                disabled={isSaving}
+                disabled={isSaving || isUploading}
                 className="text-base"
               />
-              <Input
-                placeholder="Product Image URL"
-                value={productImageUrl}
-                onChange={(e) => setProductImageUrl(e.target.value)}
-                disabled={isSaving}
-                className="text-base"
-              />
+               <div className="space-y-2">
+                <Button asChild variant="outline" className="w-full" disabled={isUploading || isSaving}>
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                     {isUploading ? <Loader className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
+                     {isUploading ? 'Uploading...' : 'Upload Image'}
+                  </label>
+                </Button>
+                <Input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isSaving}/>
+                {productImageUrl && (
+                  <div className="relative aspect-square w-full max-w-[150px] mx-auto border rounded-md overflow-hidden">
+                     <Image src={productImageUrl} alt="Product Preview" fill style={{objectFit: 'cover'}}/>
+                  </div>
+                )}
+              </div>
             </div>
             <DialogFooter className="sm:justify-end flex-row space-x-2">
                <DialogClose asChild>
-                <Button variant="outline" disabled={isSaving}>Cancel</Button>
+                <Button variant="outline" disabled={isSaving || isUploading}>Cancel</Button>
               </DialogClose>
-              <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? <Loader className="mr-2 h-4 w-4 animate-spin"/> : null}
+              <Button onClick={handleSave} disabled={isSaving || isUploading}>
+                {(isSaving) && <Loader className="mr-2 h-4 w-4 animate-spin"/>}
                 {isSaving ? 'Saving...' : 'Save'}
               </Button>
             </DialogFooter>
@@ -243,6 +284,7 @@ export default function ReelsPage() {
               <TableRow>
                 <TableHead>Reel No.</TableHead>
                 <TableHead>Product URL</TableHead>
+                <TableHead>Image</TableHead>
                 <TableHead className="text-right w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -254,6 +296,11 @@ export default function ReelsPage() {
                     <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate block max-w-[150px] sm:max-w-xs md:max-w-sm lg:max-w-md">
                       {reel.productUrl}
                     </a>
+                  </TableCell>
+                   <TableCell>
+                    {reel.productImageUrl && (
+                       <Image src={reel.productImageUrl} alt={`Reel ${reel.reelNumber}`} width={40} height={40} className="rounded-md object-cover"/>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => handleEdit(reel)}>
