@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
@@ -88,11 +89,9 @@ export default function Home() {
           url: link,
         });
       } catch (err) {
-        // If sharing fails, fall back to copying.
         handleCopy();
       }
     } else {
-      // If navigator.share is not supported, fall back to copying.
       handleCopy();
     }
   };
@@ -127,6 +126,13 @@ export default function Home() {
   return (
     <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
       <div className="z-10 flex flex-col items-center w-full">
+        <Image
+          src="/logo.png"
+          alt="143look Logo"
+          width={128}
+          height={128}
+          className="mb-4"
+        />
         <h1 className="text-3xl md:text-4xl font-black tracking-tighter mb-2 text-foreground">
           Find Your Look.
         </h1>
