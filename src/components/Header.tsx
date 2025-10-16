@@ -8,7 +8,9 @@ const Header = () => {
           href="/"
           className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
         >
-          <span className="text-3xl font-black tracking-tighter text-primary">143look</span>
+          <span className="text-3xl font-black tracking-tighter">
+            <span className="text-primary">143</span>look
+          </span>
         </Link>
         <Link
           href="/analytics"
