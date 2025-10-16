@@ -14,10 +14,14 @@ body {
   font-family: var(--font-pt-sans), sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-poppins), sans-serif;
 }
-
 
 @layer base {
   :root {
@@ -27,19 +31,19 @@ h1, h2, h3, h4, h5, h6 {
     --card-foreground: 300 10% 10%;
     --popover: 285 25% 96%;
     --popover-foreground: 300 10% 10%;
-    --primary: 276 100% 41%; /* Saturated violet */
+    --primary: 336 84% 51%; /* Vivid Pink */
     --primary-foreground: 0 0% 100%;
     --secondary: 285 20% 90%;
     --secondary-foreground: 300 10% 10%;
     --muted: 285 20% 90%;
     --muted-foreground: 300 5% 45%;
-    --accent: 336 100% 71%; /* Vivid pink */
-    --accent-foreground: 300 10% 10%;
+    --accent: 276 100% 61%; /* Saturated violet */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 285 20% 85%;
     --input: 0 0% 100%;
-    --ring: 276 100% 41%;
+    --ring: 336 84% 51%;
     --radius: 0.5rem;
     --chart-1: 276 70% 50%;
     --chart-2: 336 60% 45%;
@@ -63,19 +67,19 @@ h1, h2, h3, h4, h5, h6 {
     --card-foreground: 0 0% 98%;
     --popover: 300 10% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 276 100% 61%; /* Saturated violet */
-    --primary-foreground: 0 0% 100%;
+    --primary: 336 84% 61%; /* Vivid Pink */
+    --primary-foreground: 0 0% 10%;
     --secondary: 300 10% 20%;
     --secondary-foreground: 0 0% 98%;
     --muted: 300 10% 20%;
     --muted-foreground: 0 0% 60%;
-    --accent: 336 100% 71%; /* Vivid pink */
+    --accent: 276 100% 71%; /* Saturated violet */
     --accent-foreground: 0 0% 10%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
     --border: 300 10% 25%;
     --input: 300 10% 20%;
-    --ring: 276 100% 61%;
+    --ring: 336 84% 61%;
     --chart-1: 276 70% 50%;
     --chart-2: 336 60% 45%;
     --chart-3: 30 80% 55%;
