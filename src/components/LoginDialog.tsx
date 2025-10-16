@@ -37,15 +37,15 @@ export function LoginDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost">Login</Button>
+        <Button variant="ghost" size="sm">Login</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-card border-border">
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold">
-            Login
+            Admin Access
           </DialogTitle>
           <DialogDescription className="text-center text-muted-foreground pt-2">
-            Login or sign up to continue.
+            Login to manage your application.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">

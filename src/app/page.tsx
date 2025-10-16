@@ -114,52 +114,52 @@ export default function Home() {
     <>
       <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
         <div className="z-10 flex flex-col items-center w-full">
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 text-foreground">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3 text-foreground">
             Find Your Look.
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-lg mb-8 px-4">
+          <p className="text-sm md:text-base text-muted-foreground max-w-md mb-6 px-4">
             Saw something you loved in a Reel? Enter the code below to get the direct link to the product.
           </p>
 
-          <div className="flex w-full max-w-xs sm:max-w-sm items-center space-x-2 mb-4 px-4">
+          <div className="flex w-full max-w-xs items-center space-x-2 mb-4 px-4">
             <Input
               type="text"
               placeholder="Enter Reel Code..."
               value={code}
               onChange={(e) => setCode(e.target.value.trim())}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="h-12 text-base border-border focus:ring-primary text-center"
+              className="h-11 text-sm border-border focus:ring-primary text-center"
               disabled={isLoading}
             />
             <Button
               size="icon"
               onClick={handleSearch}
-              className="h-12 w-12 flex-shrink-0 bg-primary hover:bg-primary/90"
+              className="h-11 w-11 flex-shrink-0 bg-primary hover:bg-primary/90"
               disabled={isLoading}
             >
               {isLoading ? <Loader className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
             </Button>
           </div>
 
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
           {link && (
-            <Card className="w-full max-w-xs sm:max-w-sm mt-8 bg-card border-border/50 shadow-lg">
-              <CardContent className="p-4">
-                <p className="text-sm text-muted-foreground break-words mb-4 text-left p-2 bg-secondary rounded-md">
+            <Card className="w-full max-w-xs mt-6 bg-card border-border/50 shadow-lg">
+              <CardContent className="p-3">
+                <p className="text-xs text-muted-foreground break-words mb-3 text-left p-2 bg-secondary rounded-md">
                   {link}
                 </p>
-                <div className="flex justify-center space-x-2 flex-wrap gap-2">
-                  <Button variant="ghost" onClick={handleCopy} className="flex-1 min-w-[80px]">
-                    <Copy className="h-4 w-4 mr-2" />
+                <div className="flex justify-center space-x-2 flex-wrap gap-1">
+                  <Button variant="ghost" size="sm" onClick={handleCopy} className="flex-1 min-w-[70px]">
+                    <Copy className="h-4 w-4 mr-1" />
                     Copy
                   </Button>
-                  <Button variant="ghost" onClick={handleShare} className="flex-1 min-w-[80px]">
-                    <Share2 className="h-4 w-4 mr-2" />
+                  <Button variant="ghost" size="sm" onClick={handleShare} className="flex-1 min-w-[70px]">
+                    <Share2 className="h-4 w-4 mr-1" />
                     Share
                   </Button>
-                  <Button onClick={handleRedirect} className="flex-1 min-w-[80px] bg-accent text-accent-foreground hover:bg-accent/90">
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                  <Button size="sm" onClick={handleRedirect} className="flex-1 min-w-[70px] bg-accent text-accent-foreground hover:bg-accent/90">
+                    <ExternalLink className="h-4 w-4 mr-1" />
                     Visit
                   </Button>
                 </div>

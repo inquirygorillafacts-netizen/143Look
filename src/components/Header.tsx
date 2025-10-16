@@ -25,35 +25,35 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full py-6 px-4 md:px-8 z-10 bg-background/80 backdrop-blur-sm sticky top-0 border-b border-border/20">
+    <header className="w-full py-4 px-4 md:px-6 z-10 bg-background/80 backdrop-blur-sm sticky top-0 border-b border-border/20">
       <nav className="max-w-6xl mx-auto flex justify-between items-center">
         <Link
           href="/"
           className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
         >
-          <div className="text-3xl font-black tracking-tighter">
+          <div className="text-2xl font-black tracking-tighter">
             <span className="font-poppins font-thin text-primary">1</span>
-            <span className="font-poppins font-black text-primary text-4xl mx-[-0.2rem]">
+            <span className="font-poppins font-black text-primary text-3xl mx-[-0.15rem]">
               4
             </span>
-            <span className="font-poppins font-normal italic text-primary text-2xl">
+            <span className="font-poppins font-normal italic text-primary text-xl">
               3
             </span>
             <span className="text-foreground">look</span>
           </div>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {user && owner && (
              <Link href="/admin" passHref>
-                <Button variant="ghost">Admin</Button>
+                <Button variant="ghost" size="sm">Admin</Button>
             </Link>
           )}
           {isUserLoading ? (
-            <Button variant="ghost" disabled>
-              Loading...
+            <Button variant="ghost" size="sm" disabled>
+              ...
             </Button>
           ) : user ? (
-            <Button variant="ghost" onClick={handleLogout}>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
               Logout
             </Button>
           ) : (
