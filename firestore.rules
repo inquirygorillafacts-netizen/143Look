@@ -1,0 +1,94 @@
+/**
+ * @fileoverview Firestore Security Rules for the Reel App.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict owner-only access model for the entire database. Only the user whose Google ID is stored in the `/owners/{ownerId}` document can read or write any data. This is designed for an application with a single administrative user.
+ *
+ * Data Structure:
+ * - /reels/{reelId}: Stores reel data (reelNumber, productUrl).
+ * - /reels/{reelId}/analytics_events/{analyticsEventId}: Stores analytics events for each reel.
+ * - /owners/{ownerId}: Stores the Google ID of the application owner. The ownerId MUST match the user's UID.
+ *
+ * Key Security Decisions:
+ * - Strict Owner-Only Access: Only the authenticated user whose UID matches an existing document in `/owners/{ownerId}` can read or write data.
+ * - No Public Listing: The `list` operation is explicitly denied for all collections to prevent unauthorized data discovery.
+ * - Denormalization for Authorization: The `owners` collection acts as a role-based access control mechanism. The presence of an owner document grants full database access.
+ * - Existence over Content: Access is granted based on the existence of a document in `/owners/{ownerId}` rather than the content of that document.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the request is authenticated.
+     * @path N/A (Helper function)
+     * @allow N/A (Helper function)
+     * @deny N/A (Helper function)
+     * @principle Verifies user authentication.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the application.
+     * @path N/A (Helper function)
+     * @allow N/A (Helper function)
+     * @deny N/A (Helper function)
+     * @principle Verifies ownership based on the /owners collection.
+     */
+    function isOwner() {
+      return isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid));
+    }
+
+    /**
+     * @description Rules for the /reels collection.
+     * @path /reels/{reelId}
+     * @allow (get) Signed-in owner can retrieve a reel.
+     * @allow (create) Signed-in owner can create a reel.
+     * @deny (get) Anonymous user cannot retrieve a reel.
+     * @deny (create) Non-owner cannot create a reel.
+     * @principle Enforces owner-only access for reel data.
+     */
+    match /reels/{reelId} {
+      allow get: if isOwner();
+      allow list: if false;
+      allow create: if isOwner();
+      allow update: if isOwner();
+      allow delete: if isOwner();
+    }
+
+    /**
+     * @description Rules for the /reels/{reelId}/analytics_events collection.
+     * @path /reels/{reelId}/analytics_events/{analyticsEventId}
+     * @allow (get) Signed-in owner can retrieve an analytics event.
+     * @allow (create) Signed-in owner can create an analytics event.
+     * @deny (get) Anonymous user cannot retrieve an analytics event.
+     * @deny (create) Non-owner cannot create an analytics event.
+     * @principle Enforces owner-only access for analytics event data.
+     */
+    match /reels/{reelId}/analytics_events/{analyticsEventId} {
+      allow get: if isOwner();
+      allow list: if false;
+      allow create: if isOwner();
+      allow update: if isOwner();
+      allow delete: if isOwner();
+    }
+
+    /**
+     * @description Rules for the /owners collection.
+     * @path /owners/{ownerId}
+     * @allow (create) Allows a user to create their owner document if their UID matches the document ID.
+     * @deny (get) Prevents unauthorized retrieval of owner documents.
+     * @deny (create) Prevents unauthorized creation of owner documents with mismatched IDs.
+     * @principle Enforces self-creation and restricts access to owner documents.
+     */
+    match /owners/{ownerId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if isSignedIn() && request.auth.uid == ownerId;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

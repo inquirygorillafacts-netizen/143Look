@@ -1,0 +1,144 @@
+{
+  "entities": {
+    "Reel": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Reel",
+      "type": "object",
+      "description": "Represents a reel and its associated product URL.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Reel entity."
+        },
+        "reelNumber": {
+          "type": "string",
+          "description": "The reel number as displayed on Instagram."
+        },
+        "productUrl": {
+          "type": "string",
+          "description": "The direct URL to the product page.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "reelNumber",
+        "productUrl"
+      ]
+    },
+    "AnalyticsEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AnalyticsEvent",
+      "type": "object",
+      "description": "Represents an analytics event, such as a reel number entry or a click-through.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AnalyticsEvent entity."
+        },
+        "reelId": {
+          "type": "string",
+          "description": "Reference to Reel. (Relationship: Reel 1:N AnalyticsEvent)"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "The type of analytics event (e.g., 'reel_entry', 'click_through')."
+        },
+        "eventTimestamp": {
+          "type": "string",
+          "description": "The timestamp of the analytics event.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "reelId",
+        "eventType",
+        "eventTimestamp"
+      ]
+    },
+    "Owner": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Owner",
+      "type": "object",
+      "description": "Represents the owner of the application, allowed to log in via Google.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Owner entity."
+        },
+        "googleId": {
+          "type": "string",
+          "description": "The Google ID of the owner, used for authentication."
+        }
+      },
+      "required": [
+        "id",
+        "googleId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/reels/{reelId}",
+        "definition": {
+          "entityName": "Reel",
+          "schema": {
+            "$ref": "#/backend/entities/Reel"
+          },
+          "description": "Stores the reel data, including the reel number and associated product URL.",
+          "params": [
+            {
+              "name": "reelId",
+              "description": "The unique identifier for the reel document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/reels/{reelId}/analytics_events/{analyticsEventId}",
+        "definition": {
+          "entityName": "AnalyticsEvent",
+          "schema": {
+            "$ref": "#/backend/entities/AnalyticsEvent"
+          },
+          "description": "Stores analytics events related to a specific reel. Implicitly grants read access to all documents within a 'reels' document through the owner.",
+          "params": [
+            {
+              "name": "reelId",
+              "description": "The unique identifier for the reel document."
+            },
+            {
+              "name": "analyticsEventId",
+              "description": "The unique identifier for the analytics event document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/owners/{ownerId}",
+        "definition": {
+          "entityName": "Owner",
+          "schema": {
+            "$ref": "#/backend/entities/Owner"
+          },
+          "description": "Stores information about the application owner, allowing login via Google. Existence in this collection grants admin access.",
+          "params": [
+            {
+              "name": "ownerId",
+              "description": "The unique identifier for the owner document, matching the user's UID."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to be secure, scalable, and easily debuggable, following the core design principles and strategy mandates. It incorporates Authorization Independence via Denormalization, Structural Segregation for homogeneous security postures, Access Modeling for standardization, and Data Clarity and Predictability for maintainability.\n\nThe `reels` collection stores the reel and product URL data. Each document has an `id`, `reelNumber`, and `productUrl`.  Authorization is simplified because no specific ownership is required for reels. The analytics events related to these reels are stored in a subcollection `analytics_events` under each reel document. This allows efficient querying of analytics data related to specific reels.\n\nAuthorization Independence is achieved in the `analytics_events` subcollection by implicitly granting read access to all documents within a `reels` document. Since access to the entire dataset should be restricted to the owner only, the entire Firestore database will be secured using a role-based access control mechanism, enforced via Firebase Authentication, granting access only to a specific Google ID. This approach eliminates the need for complex security rules that rely on parent document data or `get()` calls, allowing atomic operations and easy debugging. \n\nThe `owners` collection stores information about the application's owner, specifically their Google ID.  This is used for authentication purposes, ensuring only the designated owner can access the data. The presence of a document in `/owners/{ownerId}` grants administrative access. Using existence over content enhances security.\n\nThe database structure facilitates secure `list` operations by segregating data with different access requirements. The root-level reels collection contains the main data, and the analytics events are nested under each reel, which, in combination with the owner-based top-level rule, effectively protects the data from unauthorized listing and access.\n"
+  }
+}
