@@ -49,21 +49,15 @@ export default function Home() {
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
         const foundReel = { id: doc.id, ...doc.data() } as Reel;
-        
-        setLink(foundReel.productUrl);
-        setImageUrl(foundReel.productImageUrl);
-        
-        // Log search event
-        const analyticsCollection = collection(firestore, `reels/${foundReel.id}/analytics_events`);
-        const eventData = {
-            eventType: 'reel_entry',
-            eventTimestamp: Timestamp.now(),
-        };
-        addDoc(analyticsCollection, eventData).catch(e => {
-            const contextualError = new FirestorePermissionError({ operation: 'create', path: analyticsCollection.path, requestResourceData: eventData });
-            errorEmitter.emit('permission-error', contextualError);
-        });
 
+        if (foundReel) {
+          setLink(foundReel.productUrl);
+          setImageUrl(foundReel.productImageUrl);
+        } else {
+           setImageUrl(null);
+           setLink('');
+           setError('Invalid code. Please try again.');
+        }
       } else {
         setLink('');
         setImageUrl(null);
@@ -132,13 +126,15 @@ export default function Home() {
   return (
     <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
       <div className="z-10 flex flex-col items-center w-full">
-        <Image
-          src="/logo.png"
-          alt="143 Look Logo"
-          width={128}
-          height={128}
-          className="mb-4 rounded-full"
-        />
+        {imageUrl === null && (
+          <Image
+            src="/logo.png"
+            alt="143 Look Logo"
+            width={128}
+            height={128}
+            className="mb-4 rounded-full"
+          />
+        )}
         <h1 className="text-3xl md:text-4xl font-black tracking-tighter mb-2 text-foreground">
           Find Your Look.
         </h1>
