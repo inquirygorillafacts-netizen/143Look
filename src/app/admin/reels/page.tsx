@@ -76,7 +76,7 @@ export default function ReelsPage() {
   
   const handleDelete = async (reelId: string, reelNum: string) => {
     if (!firestore) return;
-    if (confirm(`Are you sure you want to delete reel #${reelNum}? This will also delete its analytics data.`)) {
+    if (confirm(`Are you sure you want to delete reel ${reelNum}? This will also delete its analytics data.`)) {
       const reelDocRef = doc(firestore, 'reels', reelId);
       
       deleteDoc(reelDocRef).then(async () => {
@@ -88,7 +88,7 @@ export default function ReelsPage() {
           });
           await batch.commit();
           
-          toast({ title: 'Reel Deleted', description: `Reel #${reelNum} and its analytics have been deleted.` });
+          toast({ title: 'Reel Deleted', description: `Reel ${reelNum} and its analytics have been deleted.` });
       }).catch(error => {
           const contextualError = new FirestorePermissionError({ operation: 'delete', path: reelDocRef.path });
           errorEmitter.emit('permission-error', contextualError);
@@ -181,7 +181,7 @@ export default function ReelsPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{currentReel ? `Edit Reel #${currentReel.reelNumber}` : 'Add New Reel'}</DialogTitle>
+              <DialogTitle>{currentReel ? `Edit Reel ${currentReel.reelNumber}` : 'Add New Reel'}</DialogTitle>
                <DialogDescription>
                 Add or edit a reel number and its corresponding product URL.
               </DialogDescription>
@@ -232,7 +232,7 @@ export default function ReelsPage() {
             <TableBody>
               {sortedReels?.map((reel) => (
                 <TableRow key={reel.id}>
-                  <TableCell>#{reel.reelNumber}</TableCell>
+                  <TableCell>{reel.reelNumber}</TableCell>
                   <TableCell>
                     <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate block max-w-[150px] sm:max-w-xs md:max-w-sm lg:max-w-md">
                       {reel.productUrl}

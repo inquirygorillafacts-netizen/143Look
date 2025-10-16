@@ -265,7 +265,7 @@ export default function AnalyticsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">#{kpiData?.mostPopularReel ?? '-'}</div>
+            <div className="text-2xl font-bold">{kpiData?.mostPopularReel ?? '-'}</div>
           </CardContent>
         </Card>
       </div>
@@ -307,7 +307,7 @@ export default function AnalyticsPage() {
               <TableBody>
                 {topPerformingReels.map((reel) => (
                   <TableRow key={reel.reel}>
-                    <TableCell className="font-medium">#{reel.reel}</TableCell>
+                    <TableCell className="font-medium">{reel.reel}</TableCell>
                     <TableCell className="text-right">{reel.ctr.toFixed(1)}%</TableCell>
                     <TableCell className="text-right">{reel.clicks}</TableCell>
                     <TableCell className="text-right">{reel.searches}</TableCell>
@@ -333,7 +333,7 @@ export default function AnalyticsPage() {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                tickFormatter={(value) => `#${value}`}
+                tickFormatter={(value) => `${value}`}
                 fontSize={12}
               />
               <YAxis fontSize={12} tickMargin={8}/>
