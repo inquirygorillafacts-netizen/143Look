@@ -153,7 +153,7 @@ export default function Home() {
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
           {link && (
-            <Card className="w-full max-w-xs mt-4 bg-card border-border/50 shadow-lg">
+            <Card className="w-full max-w-sm mt-4 bg-card border-border/50 shadow-lg">
               <CardContent className="p-3">
                 <p className="text-xs text-muted-foreground break-words mb-3 text-left p-2 bg-secondary rounded-md">
                   {link}

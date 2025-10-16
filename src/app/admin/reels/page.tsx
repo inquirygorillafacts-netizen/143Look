@@ -202,7 +202,7 @@ export default function ReelsPage() {
                 className="text-base"
               />
             </div>
-            <DialogFooter className="flex-row justify-end space-x-2">
+            <DialogFooter className="sm:justify-end flex-row space-x-2">
                <DialogClose asChild>
                 <Button variant="outline" disabled={isSaving}>Cancel</Button>
               </DialogClose>
