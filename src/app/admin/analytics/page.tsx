@@ -34,7 +34,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
-import { useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { useFirestore, errorEmitter, FirestorePermissionError, useMemoFirebase } from '@/firebase';
 import { collection, getDocs, collectionGroup, Timestamp } from 'firebase/firestore';
 import { format, subDays } from 'date-fns';
 
@@ -79,6 +79,7 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   
   const topPerformingReels = useMemo(() => {
+    // Create a shallow copy before sorting to avoid mutating the original state array
     return [...analyticsData].sort((a,b) => b.ctr - a.ctr).slice(0, 5);
   }, [analyticsData]);
 
@@ -353,5 +354,4 @@ export default function AnalyticsPage() {
       </Card>
     </div>
   );
-
-    
+}
