@@ -13,6 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
+import { testimonials } from '@/lib/testimonials';
 
 export default function Home() {
   const [code, setCode] = useState('');
@@ -67,7 +69,6 @@ export default function Home() {
       <div className="absolute bottom-0 -right-1/4 w-96 h-96 bg-blue-500/30 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
       <div className="absolute top-1/4 left-1/3 w-80 h-80 bg-pink-500/30 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-4000" />
 
-
       <Card className="w-full max-w-md z-10 bg-black/30 backdrop-blur-md border-purple-500/50 text-white">
         <CardHeader>
           <CardTitle className="font-headline text-4xl font-bold tracking-tighter text-center">
@@ -87,7 +88,12 @@ export default function Home() {
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className="bg-gray-800/50 border-purple-400/50 text-white placeholder:text-gray-500 text-center"
             />
-            <Button variant="outline" size="icon" onClick={handleSearch} className="bg-purple-600 hover:bg-purple-700 border-none">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleSearch}
+              className="bg-purple-600 hover:bg-purple-700 border-none"
+            >
               <Search className="h-5 w-5" />
             </Button>
           </div>
@@ -98,16 +104,30 @@ export default function Home() {
             <div className="mt-6 p-4 bg-white/10 rounded-lg border border-purple-500/30">
               <p className="text-sm text-gray-300 break-words mb-4">{link}</p>
               <div className="flex justify-center space-x-3">
-                <Button variant="ghost" size="icon" onClick={handleCopy} className="hover:bg-purple-500/20">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopy}
+                  className="hover:bg-purple-500/20"
+                >
                   <Copy className="h-5 w-5" />
                   <span className="sr-only">Copy</span>
                 </Button>
-                <Button variant="ghost" size="icon" onClick={handleShare} className="hover:bg-purple-500/20">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleShare}
+                  className="hover:bg-purple-500/20"
+                >
                   <Share2 className="h-5 w-5" />
                   <span className="sr-only">Share</span>
                 </Button>
                 <a href={link} target="_blank" rel="noopener noreferrer">
-                  <Button variant="ghost" size="icon" className="hover:bg-purple-500/20">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-purple-500/20"
+                  >
                     <ExternalLink className="h-5 w-5" />
                     <span className="sr-only">Open</span>
                   </Button>
@@ -117,6 +137,13 @@ export default function Home() {
           )}
         </CardContent>
       </Card>
+      <div className="w-full absolute bottom-10">
+        <InfiniteMovingCards
+          items={testimonials}
+          direction="right"
+          speed="slow"
+        />
+      </div>
     </div>
   );
 }
