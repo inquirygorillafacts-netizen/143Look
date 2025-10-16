@@ -1,13 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { BarChart, CreditCard, TrendingUp, Users, Loader } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import {
   ChartContainer,
   ChartTooltip,
@@ -18,13 +27,17 @@ import {
 import {
   Bar,
   BarChart as RechartsBarChart,
+  Line,
+  LineChart as RechartsLineChart,
   CartesianGrid,
   XAxis,
   YAxis,
 } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
 import { useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
-import { collection, getDocs, collectionGroup, query } from 'firebase/firestore';
+import { collection, getDocs, collectionGroup, Timestamp } from 'firebase/firestore';
+import { format, subDays } from 'date-fns';
+
 
 const chartConfig = {
   searches: {
@@ -41,6 +54,7 @@ interface AnalyticsData {
   reel: string;
   searches: number;
   clicks: number;
+  ctr: number;
 }
 
 interface KpiData {
@@ -50,12 +64,23 @@ interface KpiData {
   mostPopularReel: string;
 }
 
+interface DailyActivity {
+    date: string;
+    searches: number;
+    clicks: number;
+}
+
 export default function AnalyticsPage() {
   const firestore = useFirestore();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
   const [kpiData, setKpiData] = useState<KpiData | null>(null);
+  const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const topPerformingReels = useMemo(() => {
+    return [...analyticsData].sort((a,b) => b.ctr - a.ctr).slice(0, 5);
+  }, [analyticsData]);
 
 
   useEffect(() => {
@@ -67,35 +92,38 @@ export default function AnalyticsPage() {
       const reelsCollection = collection(firestore, 'reels');
       const analyticsEventsCollectionGroup = collectionGroup(firestore, 'analytics_events');
 
-      const reelsQuerySnapshotPromise = getDocs(reelsCollection).catch(e => {
-        const contextualError = new FirestorePermissionError({ operation: 'list', path: 'reels'});
-        errorEmitter.emit('permission-error', contextualError);
-        throw contextualError;
-      });
-
-      const analyticsSnapshotPromise = getDocs(analyticsEventsCollectionGroup).catch(e => {
-        const contextualError = new FirestorePermissionError({ operation: 'list', path: 'analytics_events (collectionGroup)'});
-        errorEmitter.emit('permission-error', contextualError);
-        throw contextualError;
-      });
-
       try {
         const [reelsQuerySnapshot, analyticsSnapshot] = await Promise.all([
-          reelsQuerySnapshotPromise,
-          analyticsSnapshotPromise
+           getDocs(reelsCollection).catch(e => {
+                const contextualError = new FirestorePermissionError({ operation: 'list', path: 'reels'});
+                errorEmitter.emit('permission-error', contextualError);
+                throw contextualError;
+            }),
+           getDocs(analyticsEventsCollectionGroup).catch(e => {
+                const contextualError = new FirestorePermissionError({ operation: 'list', path: 'analytics_events (collectionGroup)'});
+                errorEmitter.emit('permission-error', contextualError);
+                throw contextualError;
+            })
         ]);
 
         const reels = reelsQuerySnapshot.docs.map(doc => ({ id: doc.id, reelNumber: doc.data().reelNumber as string }));
         
         const analyticsByReel: { [key: string]: { searches: number; clicks: number } } = {};
-
-        for (const reel of reels) {
+        reels.forEach(reel => {
             analyticsByReel[reel.id] = { searches: 0, clicks: 0 };
-        }
+        });
         
+        const dailyCounts: { [date: string]: { searches: number; clicks: number } } = {};
+        const today = new Date();
+        for (let i = 0; i < 7; i++) {
+            const dateKey = format(subDays(today, i), 'yyyy-MM-dd');
+            dailyCounts[dateKey] = { searches: 0, clicks: 0 };
+        }
+
         analyticsSnapshot.docs.forEach(eventDoc => {
           const eventData = eventDoc.data();
-          const reelId = eventDoc.ref.parent.parent?.id; // analytics_events is a subcollection
+          const reelId = eventDoc.ref.parent.parent?.id; 
+          
           if (reelId && analyticsByReel[reelId]) {
             if (eventData.eventType === 'reel_entry') {
               analyticsByReel[reelId].searches += 1;
@@ -103,14 +131,38 @@ export default function AnalyticsPage() {
               analyticsByReel[reelId].clicks += 1;
             }
           }
+
+          if (eventData.eventTimestamp) {
+              const eventDate = (eventData.eventTimestamp as Timestamp).toDate();
+              const dateKey = format(eventDate, 'yyyy-MM-dd');
+              if (dailyCounts.hasOwnProperty(dateKey)) {
+                  if (eventData.eventType === 'reel_entry') {
+                    dailyCounts[dateKey].searches += 1;
+                  } else if (eventData.eventType === 'click_through') {
+                    dailyCounts[dateKey].clicks += 1;
+                  }
+              }
+          }
         });
 
-        const formattedAnalyticsData: AnalyticsData[] = reels.map(reel => ({
-          reel: reel.reelNumber,
-          ...analyticsByReel[reel.id]
-        })).sort((a,b) => parseInt(a.reel, 10) - parseInt(b.reel, 10));
+        const formattedAnalyticsData: AnalyticsData[] = reels.map(reel => {
+          const searches = analyticsByReel[reel.id].searches;
+          const clicks = analyticsByReel[reel.id].clicks;
+          return {
+            reel: reel.reelNumber,
+            searches,
+            clicks,
+            ctr: searches > 0 ? (clicks / searches) * 100 : 0,
+          }
+        }).sort((a,b) => parseInt(a.reel, 10) - parseInt(b.reel, 10));
 
         setAnalyticsData(formattedAnalyticsData);
+
+        const formattedDailyActivity = Object.entries(dailyCounts).map(([date, counts]) => ({
+            date: format(new Date(date), 'MMM d'),
+            ...counts
+        })).reverse();
+        setDailyActivity(formattedDailyActivity);
 
         const totalSearches = formattedAnalyticsData.reduce((acc, curr) => acc + curr.searches, 0);
         const totalClicks = formattedAnalyticsData.reduce((acc, curr) => acc + curr.clicks, 0);
@@ -208,7 +260,7 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Most Popular Reel
+              Most Clicked Reel
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -217,6 +269,56 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+       <div className="grid gap-4 md:grid-cols-2">
+         <Card>
+          <CardHeader>
+            <CardTitle>Activity Over Last 7 Days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+              <RechartsLineChart data={dailyActivity}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Line type="monotone" dataKey="searches" stroke="var(--color-searches)" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="clicks" stroke="var(--color-clicks)" strokeWidth={2} dot={false}/>
+              </RechartsLineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader>
+            <CardTitle>Top Performing Reels</CardTitle>
+            <CardDescription>By Click-Through Rate (CTR)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Reel</TableHead>
+                  <TableHead className="text-right">CTR</TableHead>
+                  <TableHead className="text-right">Clicks</TableHead>
+                  <TableHead className="text-right">Searches</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {topPerformingReels.map((reel) => (
+                  <TableRow key={reel.reel}>
+                    <TableCell className="font-medium">#{reel.reel}</TableCell>
+                    <TableCell className="text-right">{reel.ctr.toFixed(1)}%</TableCell>
+                    <TableCell className="text-right">{reel.clicks}</TableCell>
+                    <TableCell className="text-right">{reel.searches}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
 
       <Card>
         <CardHeader>
@@ -251,4 +353,3 @@ export default function AnalyticsPage() {
       </Card>
     </div>
   );
-}
