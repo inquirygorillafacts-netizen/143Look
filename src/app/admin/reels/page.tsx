@@ -128,7 +128,7 @@ export default function ReelsPage() {
       toast({ variant: 'destructive', title: 'Error', description: 'Please fill in reel number and product URL.' });
       return;
     }
-     if (!productImageUrl) {
+     if (!productImageUrl && !imageFile) {
       toast({ variant: 'destructive', title: 'Error', description: 'Please select an image.' });
       return;
     }
