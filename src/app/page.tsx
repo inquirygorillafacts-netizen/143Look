@@ -127,7 +127,7 @@ export default function Home() {
             Find Your Look.
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-sm mb-6 px-4">
-            Saw something you loved in a Reel? Enter the code below to get the direct link to the product.
+            रील में कुछ पसंद आया? प्रोडक्ट का सीधा लिंक पाने के लिए नीचे कोड डालें।
           </p>
 
           <div className="flex w-full max-w-sm items-center space-x-2 mb-4">
