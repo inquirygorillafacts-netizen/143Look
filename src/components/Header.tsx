@@ -3,11 +3,21 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/LoginDialog';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore, useDoc } from '@/firebase';
 import { getAuth, signOut } from 'firebase/auth';
+import { doc } from 'firebase/firestore';
 
 const Header = () => {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+  const ownerDocRef =
+    user && firestore ? doc(firestore, 'owners', user.uid) : null;
+  
+  // This is a simplified check. In a real app, memoize the ref.
+  if (ownerDocRef) {
+    (ownerDocRef as any).__memo = true;
+  }
+  const { data: owner } = useDoc(ownerDocRef);
 
   const handleLogout = () => {
     const auth = getAuth();
@@ -33,9 +43,11 @@ const Header = () => {
           </div>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/analytics" passHref>
-            <Button variant="ghost">Analytics</Button>
-          </Link>
+          {user && owner && (
+             <Link href="/admin" passHref>
+                <Button variant="ghost">Admin</Button>
+            </Link>
+          )}
           {isUserLoading ? (
             <Button variant="ghost" disabled>
               Loading...

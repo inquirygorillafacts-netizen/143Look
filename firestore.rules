@@ -1,94 +1,108 @@
 /**
- * @fileoverview Firestore Security Rules for the Reel App.
- *
- * Core Philosophy:
- * This ruleset enforces a strict owner-only access model for the entire database. Only the user whose Google ID is stored in the `/owners/{ownerId}` document can read or write any data. This is designed for an application with a single administrative user.
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a strict owner-only access model, granting full control to the application owner (based on their Google ID).
  *
  * Data Structure:
- * - /reels/{reelId}: Stores reel data (reelNumber, productUrl).
- * - /reels/{reelId}/analytics_events/{analyticsEventId}: Stores analytics events for each reel.
- * - /owners/{ownerId}: Stores the Google ID of the application owner. The ownerId MUST match the user's UID.
+ * - /reels/{reelId}: Stores reel data (reelNumber, productUrl). Accessible only by the application owner.
+ * - /reels/{reelId}/analytics_events/{analyticsEventId}: Stores analytics events for a specific reel. Accessible only by the application owner.
+ * - /owners/{ownerId}: Stores the owner's Google ID. Existence of a document here grants admin access.
  *
  * Key Security Decisions:
- * - Strict Owner-Only Access: Only the authenticated user whose UID matches an existing document in `/owners/{ownerId}` can read or write data.
- * - No Public Listing: The `list` operation is explicitly denied for all collections to prevent unauthorized data discovery.
- * - Denormalization for Authorization: The `owners` collection acts as a role-based access control mechanism. The presence of an owner document grants full database access.
- * - Existence over Content: Access is granted based on the existence of a document in `/owners/{ownerId}` rather than the content of that document.
+ * - Only authenticated users with a matching entry in the `/owners` collection can read or write data.
+ * - No public listing of reels or analytics events is allowed.
+ * - The rule set focuses on authorization and does not validate the data types or presence of optional fields, allowing for rapid prototyping.
+ *
+ * Denormalization for Authorization:
+ * - The `owners` collection is used to quickly verify the user's role based on the authenticated Google ID, avoiding complex queries.
+ *
+ * Structural Segregation:
+ * - Data is segregated based on ownership and access needs. Only the owner can access and modify the data, while analytics events are nested under each reel.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Checks if the request is authenticated.
-     * @path N/A (Helper function)
-     * @allow N/A (Helper function)
-     * @deny N/A (Helper function)
-     * @principle Verifies user authentication.
+     * @description Checks if the current user is signed in.
+     * @return {boolean} True if the user is signed in, false otherwise.
      */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /**
-     * @description Checks if the authenticated user is the owner of the application.
-     * @path N/A (Helper function)
-     * @allow N/A (Helper function)
-     * @deny N/A (Helper function)
-     * @principle Verifies ownership based on the /owners collection.
+     * @description Checks if the current user is the owner based on their UID.
+     * @param {string} userId The user ID to check against.
+     * @return {boolean} True if the user is the owner, false otherwise.
      */
-    function isOwner() {
-      return isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid));
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the current user is the existing owner and the resource exists.
+     *              This function combines the ownership check with the existence check for destructive operations.
+     * @param {string} userId The user ID to check against.
+     * @return {boolean} True if the user is the owner and the document exists, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
     }
 
     /**
      * @description Rules for the /reels collection.
      * @path /reels/{reelId}
-     * @allow (get) Signed-in owner can retrieve a reel.
-     * @allow (create) Signed-in owner can create a reel.
-     * @deny (get) Anonymous user cannot retrieve a reel.
-     * @deny (create) Non-owner cannot create a reel.
-     * @principle Enforces owner-only access for reel data.
+     * @allow (create) If the user is the owner and creates a new reel.
+     * @allow (update) If the user is the owner and updates an existing reel.
+     * @allow (delete) If the user is the owner and deletes an existing reel.
+     * @deny (create) If the user is not the owner.
+     * @deny (update) If the user is not the owner.
+     * @deny (delete) If the user is not the owner.
+     * @principle Enforces owner-only access for creating, updating, and deleting reels.
      */
     match /reels/{reelId} {
-      allow get: if isOwner();
-      allow list: if false;
-      allow create: if isOwner();
-      allow update: if isOwner();
-      allow delete: if isOwner();
+      allow get: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid));
+      allow list: if false; // No public listing of reels.
+      allow create: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid));
+      allow update: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid)) && resource != null;
+      allow delete: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid)) && resource != null;
     }
 
     /**
      * @description Rules for the /reels/{reelId}/analytics_events collection.
      * @path /reels/{reelId}/analytics_events/{analyticsEventId}
-     * @allow (get) Signed-in owner can retrieve an analytics event.
-     * @allow (create) Signed-in owner can create an analytics event.
-     * @deny (get) Anonymous user cannot retrieve an analytics event.
-     * @deny (create) Non-owner cannot create an analytics event.
-     * @principle Enforces owner-only access for analytics event data.
+     * @allow (create) If the user is the owner and creates a new analytics event.
+     * @allow (update) If the user is the owner and updates an existing analytics event.
+     * @allow (delete) If the user is the owner and deletes an existing analytics event.
+     * @deny (create) If the user is not the owner.
+     * @deny (update) If the user is not the owner.
+     * @deny (delete) If the user is not the owner.
+     * @principle Enforces owner-only access for creating, updating, and deleting analytics events.
      */
     match /reels/{reelId}/analytics_events/{analyticsEventId} {
-      allow get: if isOwner();
-      allow list: if false;
-      allow create: if isOwner();
-      allow update: if isOwner();
-      allow delete: if isOwner();
+      allow get: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid));
+      allow list: if false; // No public listing of analytics events.
+      allow create: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid));
+      allow update: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid)) && resource != null;
+      allow delete: if isSignedIn() && exists(/databases/$(database)/documents/owners/$(request.auth.uid)) && resource != null;
     }
 
     /**
      * @description Rules for the /owners collection.
      * @path /owners/{ownerId}
-     * @allow (create) Allows a user to create their owner document if their UID matches the document ID.
-     * @deny (get) Prevents unauthorized retrieval of owner documents.
-     * @deny (create) Prevents unauthorized creation of owner documents with mismatched IDs.
-     * @principle Enforces self-creation and restricts access to owner documents.
+     * @allow (create) If the user's UID matches the ownerId, they are signed in, and the Google ID exists.
+     * @deny (create) If the user's UID does not match the ownerId.
+     * @allow (get) If the user is signed in and trying to get their own owner document.
+     * @allow (update) Only the owner can update their own document.
+     * @allow (delete) Only the owner can delete their own document.
+     * @principle Enforces that only the authenticated user can create their own owner document, and no one else can modify it.
      */
     match /owners/{ownerId} {
-      allow get: if false;
-      allow list: if false;
-      allow create: if isSignedIn() && request.auth.uid == ownerId;
-      allow update: if false;
-      allow delete: if false;
+      allow get: if isOwner(ownerId);
+      allow list: if false; // No listing of owners.
+      allow create: if isOwner(ownerId) && request.resource.data.id == request.auth.uid;
+      allow update: if isExistingOwner(ownerId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(ownerId);
     }
   }
 }
