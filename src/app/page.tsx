@@ -46,10 +46,10 @@ export default function Home() {
     const q = query(reelsCollection, where('reelNumber', '==', code));
     
     getDocs(q).then(async (querySnapshot) => {
-      let foundReel: Reel | null = null;
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
-        foundReel = { id: doc.id, ...doc.data() } as Reel;
+        const foundReel = { id: doc.id, ...doc.data() } as Reel;
+        
         setLink(foundReel.productUrl);
         setImageUrl(foundReel.productImageUrl);
         
