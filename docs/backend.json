@@ -18,12 +18,18 @@
           "type": "string",
           "description": "The direct URL to the product page.",
           "format": "uri"
+        },
+        "productImageUrl": {
+          "type": "string",
+          "description": "The URL for the product's image.",
+          "format": "uri"
         }
       },
       "required": [
         "id",
         "reelNumber",
-        "productUrl"
+        "productUrl",
+        "productImageUrl"
       ]
     },
     "AnalyticsEvent": {

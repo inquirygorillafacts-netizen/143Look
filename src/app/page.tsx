@@ -14,11 +14,13 @@ interface Reel {
   id: string;
   reelNumber: string;
   productUrl: string;
+  productImageUrl: string;
 }
 
 export default function Home() {
   const [code, setCode] = useState('');
   const [link, setLink] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -37,6 +39,7 @@ export default function Home() {
     setError('');
     setIsLoading(true);
     setLink('');
+    setImageUrl('');
 
     const reelsCollection = collection(firestore, 'reels');
     const q = query(reelsCollection, where('reelNumber', '==', code));
@@ -47,6 +50,7 @@ export default function Home() {
         const doc = querySnapshot.docs[0];
         foundReel = { id: doc.id, ...doc.data() } as Reel;
         setLink(foundReel.productUrl);
+        setImageUrl(foundReel.productImageUrl);
         
         // Log search event
         const analyticsCollection = collection(firestore, `reels/${foundReel.id}/analytics_events`);
@@ -61,6 +65,7 @@ export default function Home() {
 
       } else {
         setLink('');
+        setImageUrl('');
         setError('Invalid code. Please try again.');
       }
     }).catch(e => {
@@ -164,6 +169,17 @@ export default function Home() {
 
         {link && (
           <Card className="w-full max-w-sm mt-4 bg-card border-border/50 shadow-lg">
+             {imageUrl && (
+              <div className="aspect-square relative w-full overflow-hidden rounded-t-lg">
+                <Image
+                  src={imageUrl}
+                  alt="Product Image"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 640px) 100vw, 384px"
+                />
+              </div>
+            )}
             <CardContent className="p-3">
               <p className="text-xs text-muted-foreground break-words mb-3 text-left p-2 bg-secondary rounded-md">
                 {link}

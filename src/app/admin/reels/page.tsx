@@ -30,6 +30,7 @@ interface Reel {
   id: string;
   reelNumber: string;
   productUrl: string;
+  productImageUrl: string;
 }
 
 export default function ReelsPage() {
@@ -43,6 +44,7 @@ export default function ReelsPage() {
   const [currentReel, setCurrentReel] = useState<Partial<Reel> | null>(null);
   const [reelNumber, setReelNumber] = useState('');
   const [productUrl, setProductUrl] = useState('');
+  const [productImageUrl, setProductImageUrl] = useState('');
   const { toast } = useToast();
 
   const sortedReels = useMemo(() => {
@@ -64,6 +66,7 @@ export default function ReelsPage() {
     setCurrentReel(reel);
     setReelNumber(reel.reelNumber);
     setProductUrl(reel.productUrl);
+    setProductImageUrl(reel.productImageUrl || '');
     setIsDialogOpen(true);
   };
 
@@ -71,6 +74,7 @@ export default function ReelsPage() {
     setCurrentReel(null);
     setReelNumber(getNextReelNumber());
     setProductUrl('');
+    setProductImageUrl('');
     setIsDialogOpen(true);
   };
   
@@ -102,7 +106,7 @@ export default function ReelsPage() {
       toast({ variant: 'destructive', title: 'Error', description: 'Database not ready.' });
       return;
     }
-    if (!reelNumber || !productUrl) {
+    if (!reelNumber || !productUrl || !productImageUrl) {
       toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all fields.' });
       return;
     }
@@ -111,6 +115,12 @@ export default function ReelsPage() {
         new URL(productUrl);
     } catch (_) {
         toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid product URL.' });
+        return;
+    }
+     try {
+        new URL(productImageUrl);
+    } catch (_) {
+        toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid product image URL.' });
         return;
     }
 
@@ -150,7 +160,7 @@ export default function ReelsPage() {
        newReelId = docRef.id;
     }
 
-    const reelData = { id: newReelId, reelNumber, productUrl };
+    const reelData = { id: newReelId, reelNumber, productUrl, productImageUrl };
 
     setDoc(docRef, reelData, { merge: true }).then(() => {
         toast({ title: 'Success', description: `Reel ${isEditing ? 'updated' : 'created'} successfully.` });
@@ -198,6 +208,13 @@ export default function ReelsPage() {
                 placeholder="Product URL"
                 value={productUrl}
                 onChange={(e) => setProductUrl(e.target.value)}
+                disabled={isSaving}
+                className="text-base"
+              />
+              <Input
+                placeholder="Product Image URL"
+                value={productImageUrl}
+                onChange={(e) => setProductImageUrl(e.target.value)}
                 disabled={isSaving}
                 className="text-base"
               />
