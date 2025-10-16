@@ -1,82 +1,82 @@
 export const testimonials = [
   {
     quote:
-      "Stellar Links has revolutionized how we manage our digital presence. Truly a service from the future.",
-    name: "Alex Rivera",
-    title: "CEO, Nebula Corp",
+      "143look is a game-changer! I can finally find the outfits I see on Instagram Reels in an instant. So simple and fun to use.",
+    name: "Priya Sharma",
+    title: "Fashion Enthusiast",
   },
   {
     quote:
-      "The simplicity and power of this tool are unmatched. Our links have never been more organized.",
-    name: "Samantha Jones",
-    title: "Marketing Head, Galaxy Goods",
+      "As a creator, this makes it so easy to share product links with my followers. My engagement has gone up since I started using 143look codes.",
+    name: "Aarav Patel",
+    title: "Style Influencer",
   },
   {
     quote:
-      "A stunning interface combined with robust functionality. It's like navigating the stars.",
-    name: "David Chen",
-    title: "Lead Designer, Orion Designs",
+      "Love the clean design and how fast it is. No more asking 'where did you get that?' in the comments!",
+    name: "Sneha Reddy",
+    title: "College Student",
   },
   {
     quote:
-      "It's not just a link shortener; it's a complete link management system for the modern age.",
-    name: "Dr. Evelyn Reed",
-    title: "Tech Evangelist",
+      "A brilliant idea, perfectly executed. The bridge between inspiration on Reels and actual shopping is finally here.",
+    name: "Vikram Singh",
+    title: "Digital Marketer",
   },
   {
     quote:
-      "Our team's productivity has skyrocketed. Sharing and tracking links is now a seamless process.",
-    name: "Michael Brown",
-    title: "Project Manager, Supernova Inc.",
+      "My friends and I are obsessed. We share 143look codes all the time. It's like a fashion treasure hunt.",
+    name: "Ananya Gupta",
+    title: "Social Media Manager",
   },
   {
-    quote: "The analytics dashboard gives us cosmic-level insights into our link performance. Essential for any business.",
-    name: "Jessica Williams",
-    title: "Data Scientist, Pulsar Analytics"
+    quote: "The easiest way to shop the latest trends from my favorite influencers. I use it daily!",
+    name: "Rohan Mehta",
+    title: "IT Professional"
   },
   {
-    quote: "I was lost in a black hole of bookmarks before Stellar Links. Now, everything is crystal clear.",
-    name: "Chris Martinez",
-    title: "Freelance Developer"
+    quote: "I was always frustrated trying to find clothes from Reels. 143look solved that problem beautifully.",
+    name: "Isha Malhotra",
+    title: "Graphic Designer"
   },
   {
-    quote: "The speed is light-years ahead of the competition. Our links are ready in a flash.",
-    name: "Emily Garcia",
-    title: "Social Media Manager"
+    quote: "So quick and mobile-friendly. It's clear they designed this for people who are always on the go.",
+    name: "Karan Desai",
+    title: "Entrepreneur"
   },
   {
-    quote: "Customer support is as brilliant as a supernova. Always helpful and quick to respond.",
-    name: "James Johnson",
-    title: "Operations, Comet Logistics"
+    quote: "The interface is so stylish and minimalist. It makes finding fashion feel exclusive and cool.",
+    name: "Diya Joshi",
+    title: "Architecture Student"
   },
   {
-    quote: "Finally, a tool that looks as good as it performs. The design is out of this world.",
-    name: "Sophia Rodriguez",
-    title: "UX/UI Specialist"
+    quote: "Finally, a direct link! No more navigating through complicated 'link in bio' pages. Love it.",
+    name: "Siddharth Kumar",
+    title: "Photographer"
   },
   {
-    quote: "Our marketing campaigns are now powered by Stellar Links. The results are astronomical.",
-    name: "Daniel Lee",
-    title: "CMO, Astro Marketing"
-  },
-  {
-    quote: "A universe of features packed into one simple interface. Highly recommended.",
-    name: "Olivia Hernandez",
+    quote: "This is the app I didn't know I needed. It has completely changed how I discover new clothes online.",
+    name: "Neha Chauhan",
     title: "Content Strategist"
   },
   {
-    quote: "It's the central star in our digital toolset constellation. We can't work without it.",
-    name: "William Clark",
-    title: "IT Director, Kepler Systems"
+    quote: "The 'Visit' button is a great touch. One click and I'm on the product page. Super efficient.",
+    name: "Aditya Verma",
+    title: "Software Engineer"
   },
   {
-    quote: "The search functionality is lightspeed-fast. Finding the right link has never been easier.",
-    name: "Isabella Lewis",
-    title: "Digital Archivist"
+    quote: "Simple, fast, and does exactly what it promises. A must-have for anyone who loves fashion on Instagram.",
+    name: "Pooja Nair",
+    title: "HR Manager"
   },
   {
-    quote: "Stellar Links is our north star for link management. It guides all our online activities.",
-    name: "Mason Hall",
-    title: "Founder, Zenith Ventures"
+    quote: "I appreciate that it doesn't try to be a marketplace. It's just a clean, simple tool to get you where you want to go.",
+    name: "Arjun Rao",
+    title: "Product Manager"
+  },
+  {
+    quote: "Sharing links with friends is so easy now. 143look has become our go-to for style recommendations.",
+    name: "Meera Krishnan",
+    title: "Writer"
   }
 ];

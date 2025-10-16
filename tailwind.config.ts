@@ -2,6 +2,7 @@ import type {Config} from 'tailwindcss';
 const {
   default: flattenColorPalette,
 } = require('tailwindcss/lib/util/flattenColorPalette');
+const svgToDataUri = require('mini-svg-data-uri');
 
 function addVariablesForColors({ addBase, theme }: any) {
   let allColors = flattenColorPalette(theme('colors'));
@@ -23,12 +24,14 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-pt-sans)', 'sans-serif'],
+        poppins: ['var(--font-poppins)', 'sans-serif'],
+      },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-      },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -104,6 +107,11 @@ export default {
             height: '0',
           },
         },
+         scroll: {
+          to: {
+            transform: 'translate(calc(-50% - 0.5rem))',
+          },
+        },
       },
     },
   },
@@ -134,27 +142,3 @@ export default {
     },
   ],
 } satisfies Config;
-
-function svgToDataUri(svg: string) {
-  const
- 
-xmlns
- 
-=
- 
-"http://www.w3.org/2000/svg";
-  const
- 
-svgWithXmlns
- 
-=
- 
-svg
-.
-replace
-(
-    /(<svg\s*[^>]*)(>)/,
-    `$1 xmlns="${xmlns}"$2`
-  );
-  return `data:image/svg+xml;base64,${Buffer.from(svgWithXmlns).toString('base64')}`;
-}

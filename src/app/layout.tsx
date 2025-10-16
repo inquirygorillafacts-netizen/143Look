@@ -4,11 +4,24 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Poppins, PT_Sans } from 'next/font/google';
 
 export const metadata: Metadata = {
-  title: 'Stellar Links',
-  description: 'Navigate your digital universe with Stellar Links.',
+  title: '143look',
+  description: 'Find your fashion from Instagram Reels.',
 };
+
+const fontPoppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  variable: '--font-poppins',
+});
+
+const fontPtSans = PT_Sans({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-pt-sans',
+});
 
 export default function RootLayout({
   children,
@@ -16,23 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full dark">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className="h-full">
       <body
         className={cn(
           'font-sans antialiased h-full bg-background',
-          'flex flex-col'
+          'flex flex-col',
+          fontPoppins.variable,
+          fontPtSans.variable
         )}
       >
         <div className="relative flex flex-col h-full">
