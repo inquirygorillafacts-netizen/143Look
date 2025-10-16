@@ -137,7 +137,7 @@ export default function Home() {
           alt="143 Look Logo"
           width={128}
           height={128}
-          className="mb-4"
+          className="mb-4 rounded-full"
         />
         <h1 className="text-3xl md:text-4xl font-black tracking-tighter mb-2 text-foreground">
           Find Your Look.
