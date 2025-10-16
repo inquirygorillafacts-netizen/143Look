@@ -56,10 +56,17 @@ export default function Home() {
 
   return (
     <div className="relative flex-grow flex flex-col items-center justify-center p-4 overflow-hidden text-center bg-gray-900 text-white">
+      {/* Starfield background */}
+      <div className="absolute inset-0 z-0">
+        <div id="stars-sm" />
+        <div id="stars-md" />
+        <div id="stars-lg" />
+      </div>
       {/* Decorative background elements */}
-      <div className="absolute top-0 -left-1/4 w-96 h-96 bg-purple-600/30 rounded-full filter blur-3xl opacity-50 animate-pulse" />
-      <div className="absolute bottom-0 -right-1/4 w-96 h-96 bg-blue-500/30 rounded-full filter blur-3xl opacity-50 animate-pulse delay-2000" />
-      <div className="absolute top-1/4 left-1/3 w-80 h-80 bg-pink-500/30 rounded-full filter blur-3xl opacity-40 animate-pulse delay-4000" />
+      <div className="absolute top-0 -left-1/4 w-96 h-96 bg-purple-600/30 rounded-full filter blur-3xl opacity-20 animate-blob" />
+      <div className="absolute bottom-0 -right-1/4 w-96 h-96 bg-blue-500/30 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+      <div className="absolute top-1/4 left-1/3 w-80 h-80 bg-pink-500/30 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-4000" />
+
 
       <Card className="w-full max-w-md z-10 bg-black/30 backdrop-blur-md border-purple-500/50 text-white">
         <CardHeader>
