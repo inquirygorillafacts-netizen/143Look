@@ -4,7 +4,7 @@ import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { Loader, Home, BarChart2, ListManage } from 'lucide-react';
+import { Loader, Home, BarChart2, List } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -84,7 +84,7 @@ export default function AdminLayout({
           </Link>
           <Link href="/admin/reels" passHref className="flex-1">
              <Button variant="ghost" className={cn("flex flex-col items-center justify-center h-full w-full rounded-none", pathname.includes('/reels') ? 'text-primary' : 'text-muted-foreground')}>
-                <ListManage className="h-5 w-5 mb-1"/>
+                <List className="h-5 w-5 mb-1"/>
                 <span className="text-xs">Reels</span>
              </Button>
           </Link>
