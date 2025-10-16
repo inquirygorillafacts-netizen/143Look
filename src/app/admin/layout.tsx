@@ -63,12 +63,6 @@ export default function AdminLayout({
           <Link href="/admin/reels" passHref>
              <Button variant="ghost" className="w-full justify-start">Manage Reels</Button>
           </Link>
-           <Link href="/" passHref>
-             <Button variant="outline" className="w-full justify-start mt-4">
-                <Home className="mr-2 h-4 w-4" />
-                Back to Home
-             </Button>
-          </Link>
         </nav>
       </aside>
       <main className="flex-1 p-4">{children}</main>

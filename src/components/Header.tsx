@@ -1,15 +1,19 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LoginDialog } from '@/components/LoginDialog';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { getAuth, signOut } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
+import { Home } from 'lucide-react';
 
 const Header = () => {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
+  const pathname = usePathname();
+  
   const ownerDocRef = useMemoFirebase(
     () => (user && firestore ? doc(firestore, 'owners', user.uid) : null),
     [user, firestore]
@@ -21,6 +25,8 @@ const Header = () => {
     const auth = getAuth();
     signOut(auth);
   };
+
+  const isAdminPage = pathname.startsWith('/admin');
 
   return (
     <header className="w-full py-2 px-4 md:px-6 z-10 bg-background/80 backdrop-blur-sm sticky top-0 border-b border-border/20">
@@ -42,9 +48,20 @@ const Header = () => {
         </Link>
         <div className="flex items-center gap-2">
           {user && owner && (
-             <Link href="/admin" passHref>
-                <Button variant="ghost" size="sm">Admin</Button>
-            </Link>
+            <>
+              {isAdminPage ? (
+                <Link href="/" passHref>
+                  <Button variant="ghost" size="sm">
+                    <Home className="h-4 w-4 mr-1 md:mr-2"/> 
+                    <span className="hidden md:inline">Home</span>
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/admin" passHref>
+                  <Button variant="ghost" size="sm">Admin</Button>
+                </Link>
+              )}
+            </>
           )}
           {isUserLoading ? (
             <Button variant="ghost" size="sm" disabled>
