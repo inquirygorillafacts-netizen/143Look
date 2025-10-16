@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Film } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 const Header = () => {
   return (
@@ -9,8 +9,8 @@ const Header = () => {
           href="/"
           className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
         >
-          <Film className="w-6 h-6 text-primary" />
-          <span className="text-xl font-headline font-bold">ReelDirect</span>
+          <Sparkles className="w-6 h-6 text-primary" />
+          <span className="text-xl font-headline font-bold">Aura.Creative</span>
         </Link>
         <Link
           href="/analytics"

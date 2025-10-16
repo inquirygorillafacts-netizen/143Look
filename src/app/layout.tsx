@@ -6,8 +6,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'ReelDirect',
-  description: 'Get direct product links from Instagram Reels.',
+  title: 'Aura.Creative',
+  description: 'Crafting digital experiences that captivate, inspire, and elevate.',
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=PT+Sans:wght@700&display=swap"
           rel="stylesheet"
         />
       </head>
