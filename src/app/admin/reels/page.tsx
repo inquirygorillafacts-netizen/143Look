@@ -20,7 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose
+  DialogClose,
+  DialogDescription
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash, Loader } from 'lucide-react';
@@ -169,18 +170,21 @@ export default function ReelsPage() {
 
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Manage Reels</h1>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl md:text-3xl font-bold">Manage Reels</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAddNew} disabled={isLoading}>
+            <Button onClick={handleAddNew} disabled={isLoading} size="sm" className="text-xs sm:text-sm">
               <Plus className="mr-2 h-4 w-4" /> Add New Reel
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>{currentReel ? `Edit Reel #${currentReel.reelNumber}` : 'Add New Reel'}</DialogTitle>
+               <DialogDescription>
+                Add or edit a reel number and its corresponding product URL.
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Input
@@ -196,7 +200,7 @@ export default function ReelsPage() {
                 disabled={isSaving}
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex-row justify-end space-x-2">
                <DialogClose asChild>
                 <Button variant="outline" disabled={isSaving}>Cancel</Button>
               </DialogClose>
@@ -214,13 +218,13 @@ export default function ReelsPage() {
             <Loader className="h-8 w-8 animate-spin"/>
         </div>
       ) : (
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Reel Number</TableHead>
+                <TableHead>Reel No.</TableHead>
                 <TableHead>Product URL</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -228,7 +232,7 @@ export default function ReelsPage() {
                 <TableRow key={reel.id}>
                   <TableCell>#{reel.reelNumber}</TableCell>
                   <TableCell>
-                    <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate block max-w-xs">
+                    <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate block max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
                       {reel.productUrl}
                     </a>
                   </TableCell>

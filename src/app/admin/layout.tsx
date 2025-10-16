@@ -47,7 +47,7 @@ export default function AdminLayout({
 
   if (!owner) {
      return (
-      <div className="flex h-screen w-full flex-col items-center justify-center text-center">
+      <div className="flex h-screen w-full flex-col items-center justify-center text-center p-4">
         <h1 className="text-2xl font-bold">Access Denied</h1>
         <p className="text-muted-foreground">You do not have permission to view this page.</p>
         <Button onClick={() => router.push('/')} className="mt-4">Go to Homepage</Button>
@@ -60,7 +60,7 @@ export default function AdminLayout({
       {/* Desktop Sidebar */}
       <aside className="hidden w-64 flex-col border-r bg-background p-4 sm:flex">
         <nav className="flex flex-col gap-2">
-          <h3 className="font-semibold tracking-tight mb-2">Admin Menu</h3>
+          <h3 className="font-semibold tracking-tight mb-2 px-2">Admin Menu</h3>
           <Link href="/admin/analytics" passHref>
              <Button variant={pathname.includes('/analytics') ? 'secondary': 'ghost'} className="w-full justify-start">Analytics</Button>
           </Link>
@@ -71,7 +71,7 @@ export default function AdminLayout({
       </aside>
       
       {/* Main Content */}
-      <main className="flex-1 p-4 pb-20 sm:pb-4">{children}</main>
+      <main className="flex-1 p-4 sm:p-6 pb-20 sm:pb-4">{children}</main>
 
       {/* Mobile Bottom Navigation */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">

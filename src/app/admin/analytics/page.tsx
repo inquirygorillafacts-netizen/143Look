@@ -219,12 +219,12 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-8 pt-6">
-      <h2 className="text-3xl font-bold tracking-tight">
+    <div className="flex-1 space-y-4 md:space-y-8">
+      <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
         Analytics Dashboard
       </h2>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Searches</CardTitle>
@@ -271,17 +271,17 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
-       <div className="grid gap-4 md:grid-cols-2">
+       <div className="grid gap-4 lg:grid-cols-2">
          <Card>
           <CardHeader>
             <CardTitle>Activity Over Last 7 Days</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-2 sm:p-6 sm:pt-0">
             <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
-              <RechartsLineChart data={dailyActivity}>
+              <RechartsLineChart data={dailyActivity} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                <YAxis />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+                <YAxis fontSize={12} tickMargin={8}/>
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
                 <Line type="monotone" dataKey="searches" stroke="var(--color-searches)" strokeWidth={2} dot={false} />
@@ -295,7 +295,7 @@ export default function AnalyticsPage() {
             <CardTitle>Top Performing Reels</CardTitle>
             <CardDescription>By Click-Through Rate (CTR)</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -325,9 +325,9 @@ export default function AnalyticsPage() {
         <CardHeader>
           <CardTitle>Reel Performance</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-2 sm:p-6 sm:pt-0">
           <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-            <RechartsBarChart data={analyticsData}>
+            <RechartsBarChart data={analyticsData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="reel"
@@ -335,8 +335,9 @@ export default function AnalyticsPage() {
                 tickMargin={10}
                 axisLine={false}
                 tickFormatter={(value) => `#${value}`}
+                fontSize={12}
               />
-              <YAxis />
+              <YAxis fontSize={12} tickMargin={8}/>
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="dot" />}
