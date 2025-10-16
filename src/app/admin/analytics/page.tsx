@@ -305,8 +305,8 @@ export default function AnalyticsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {topPerformingReels.map((reel) => (
-                  <TableRow key={reel.reel}>
+                {topPerformingReels.map((reel, index) => (
+                  <TableRow key={`${reel.reel}-${index}`}>
                     <TableCell className="font-medium">#{reel.reel}</TableCell>
                     <TableCell className="text-right">{reel.ctr.toFixed(1)}%</TableCell>
                     <TableCell className="text-right">{reel.clicks}</TableCell>
@@ -353,3 +353,5 @@ export default function AnalyticsPage() {
       </Card>
     </div>
   );
+
+    
