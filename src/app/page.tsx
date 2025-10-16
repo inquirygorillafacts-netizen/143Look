@@ -84,8 +84,8 @@ export default function Home() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Check out this look on 143look',
-          text: 'I found this product from a Reel using 143look! You can try it too.',
+          title: '143look पर यह स्टाइल देखें',
+          text: 'यह प्रोडक्ट मुझे 143look से मिला! आप भी ट्राई करें।',
           url: link,
         });
       } catch (err) {
