@@ -140,7 +140,7 @@ export default function Home() {
       <div className="w-full absolute bottom-10">
         <InfiniteMovingCards
           items={testimonials}
-          direction="right"
+          direction="left"
           speed="slow"
         />
       </div>
