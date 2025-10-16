@@ -21,7 +21,7 @@ interface Reel {
 export default function Home() {
   const [code, setCode] = useState('');
   const [link, setLink] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -40,7 +40,7 @@ export default function Home() {
     setError('');
     setIsLoading(true);
     setLink('');
-    setImageUrl('');
+    setImageUrl(null);
 
     const reelsCollection = collection(firestore, 'reels');
     const q = query(reelsCollection, where('reelNumber', '==', code));
@@ -66,7 +66,7 @@ export default function Home() {
 
       } else {
         setLink('');
-        setImageUrl('');
+        setImageUrl(null);
         setError('Invalid code. Please try again.');
       }
     }).catch(e => {
@@ -178,6 +178,7 @@ export default function Home() {
                   layout="fill"
                   objectFit="cover"
                   sizes="(max-width: 640px) 100vw, 384px"
+                  className="rounded-full"
                 />
               </div>
             )}
