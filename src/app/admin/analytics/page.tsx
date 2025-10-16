@@ -7,7 +7,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
 import {
   Table,
@@ -34,7 +33,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
-import { useFirestore, errorEmitter, FirestorePermissionError, useMemoFirebase } from '@/firebase';
+import { useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { collection, getDocs, collectionGroup, Timestamp } from 'firebase/firestore';
 import { format, subDays } from 'date-fns';
 
@@ -224,7 +223,7 @@ export default function AnalyticsPage() {
         Analytics Dashboard
       </h2>
 
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div className="text-sm font-medium">Total Searches</div>
@@ -306,8 +305,8 @@ export default function AnalyticsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {topPerformingReels.map((reel, index) => (
-                  <TableRow key={`${reel.reel}-${index}`}>
+                {topPerformingReels.map((reel) => (
+                  <TableRow key={reel.reel}>
                     <TableCell className="font-medium">#{reel.reel}</TableCell>
                     <TableCell className="text-right">{reel.ctr.toFixed(1)}%</TableCell>
                     <TableCell className="text-right">{reel.clicks}</TableCell>
