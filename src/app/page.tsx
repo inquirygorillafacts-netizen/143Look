@@ -55,19 +55,19 @@ export default function Home() {
       <div className="flex-grow flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-grid-small-white/[0.2] z-0"></div>
 
-        <div className="z-10 flex flex-col items-center">
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 mb-4">
+        <div className="z-10 flex flex-col items-center w-full">
+          <h1 className="text-4xl md:text-7xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 mb-4">
             Stellar Links
           </h1>
-          <p className="text-lg md:text-xl text-neutral-300 max-w-2xl mb-8">
+          <p className="text-base md:text-xl text-neutral-300 max-w-2xl mb-8 px-4">
             Enter your secret code to unveil the link from your digital
             universe. Fast, secure, and always ready.
           </p>
 
-          <div className="flex w-full max-w-md items-center space-x-2 mb-4">
+          <div className="flex w-full max-w-sm items-center space-x-2 mb-4 px-4">
             <Input
               type="text"
-              placeholder="Enter your code here..."
+              placeholder="Enter your code..."
               value={code}
               onChange={(e) => setCode(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -76,7 +76,7 @@ export default function Home() {
             <Button
               size="icon"
               onClick={handleSearch}
-              className="h-12 w-12 bg-primary hover:bg-primary/90"
+              className="h-12 w-12 flex-shrink-0 bg-primary hover:bg-primary/90"
             >
               <ArrowRight className="h-5 w-5" />
             </Button>
@@ -85,17 +85,17 @@ export default function Home() {
           {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
           {link && (
-            <Card className="w-full max-w-md mt-8 bg-secondary/50 border-border/50">
-              <CardContent className="p-6">
+            <Card className="w-full max-w-sm mt-8 bg-secondary/50 border-border/50">
+              <CardContent className="p-4">
                 <p className="text-base text-neutral-200 break-words mb-4 text-left">
                   {link}
                 </p>
-                <div className="flex justify-center space-x-2">
-                  <Button variant="ghost" onClick={handleCopy} className="flex-1">
+                <div className="flex justify-center space-x-2 flex-wrap gap-2">
+                  <Button variant="ghost" onClick={handleCopy} className="flex-1 min-w-[100px]">
                     <Copy className="h-4 w-4 mr-2" />
                     Copy
                   </Button>
-                  <Button variant="ghost" onClick={handleShare} className="flex-1">
+                  <Button variant="ghost" onClick={handleShare} className="flex-1 min-w-[100px]">
                     <Share2 className="h-4 w-4 mr-2" />
                     Share
                   </Button>
@@ -103,7 +103,7 @@ export default function Home() {
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1"
+                    className="flex-1 min-w-[100px]"
                   >
                     <Button variant="ghost" className="w-full">
                       <ExternalLink className="h-4 w-4 mr-2" />
@@ -117,12 +117,12 @@ export default function Home() {
         </div>
       </div>
       <div className="w-full flex flex-col items-center justify-center pb-20">
-        <h2 className="text-3xl font-bold text-center mb-12 text-neutral-200">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-neutral-200">
           Echoes from the Cosmos
         </h2>
         <InfiniteMovingCards
           items={testimonials}
-          direction="right"
+          direction="left"
           speed="slow"
         />
       </div>
