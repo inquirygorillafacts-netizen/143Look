@@ -89,7 +89,6 @@ export default function Home() {
         });
       } catch (err) {
         // If sharing fails, fall back to copying.
-        console.error('Share failed:', err);
         handleCopy();
       }
     } else {
