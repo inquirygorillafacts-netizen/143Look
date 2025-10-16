@@ -227,7 +227,7 @@ export default function AnalyticsPage() {
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Searches</CardTitle>
+            <div className="text-sm font-medium">Total Searches</div>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -238,7 +238,7 @@ export default function AnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
+            <div className="text-sm font-medium">Total Clicks</div>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -249,9 +249,9 @@ export default function AnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <div className="text-sm font-medium">
               Click-Through Rate
-            </CardTitle>
+            </div>
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -260,9 +260,9 @@ export default function AnalyticsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <div className="text-sm font-medium">
               Most Clicked Reel
-            </CardTitle>
+            </div>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -274,7 +274,7 @@ export default function AnalyticsPage() {
        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
          <Card>
           <CardHeader>
-            <CardTitle>Activity Over Last 7 Days</CardTitle>
+            <div className="font-semibold">Activity Over Last 7 Days</div>
           </CardHeader>
           <CardContent className="p-2 sm:p-6 sm:pt-0">
             <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
@@ -292,8 +292,8 @@ export default function AnalyticsPage() {
         </Card>
          <Card>
           <CardHeader>
-            <CardTitle>Top Performing Reels</CardTitle>
-            <CardDescription>By Click-Through Rate (CTR)</CardDescription>
+            <div className="font-semibold">Top Performing Reels</div>
+            <p className="text-sm text-muted-foreground">By Click-Through Rate (CTR)</p>
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <Table>
@@ -323,7 +323,7 @@ export default function AnalyticsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Reel Performance</CardTitle>
+          <div className="font-semibold">Reel Performance</div>
         </CardHeader>
         <CardContent className="p-2 sm:p-6 sm:pt-0">
           <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
