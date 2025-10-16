@@ -45,11 +45,11 @@ export default function ReelsPage() {
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [currentReel, setCurrentReel] = useState<Partial<Reel> | null>(null);
   const [reelNumber, setReelNumber] = useState('');
   const [productUrl, setProductUrl] = useState('');
   const [productImageUrl, setProductImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   const sortedReels = useMemo(() => {
@@ -72,6 +72,7 @@ export default function ReelsPage() {
     setReelNumber(reel.reelNumber);
     setProductUrl(reel.productUrl);
     setProductImageUrl(reel.productImageUrl || '');
+    setImageFile(null); // Reset image file on edit
     setIsDialogOpen(true);
   };
 
@@ -80,6 +81,7 @@ export default function ReelsPage() {
     setReelNumber(getNextReelNumber());
     setProductUrl('');
     setProductImageUrl('');
+    setImageFile(null); // Reset image file on add new
     setIsDialogOpen(true);
   };
   
@@ -106,32 +108,14 @@ export default function ReelsPage() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setProductImageUrl(result.data.url);
-        toast({ title: 'Success', description: 'Image uploaded successfully.' });
-      } else {
-        throw new Error(result.error?.message || 'Failed to upload image.');
-      }
-    } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Upload Error', description: error.message || 'An unknown error occurred.' });
-    } finally {
-      setIsUploading(false);
-    }
+    setImageFile(file);
+    // Create a local URL for preview
+    const previewUrl = URL.createObjectURL(file);
+    setProductImageUrl(previewUrl);
   };
 
 
@@ -140,8 +124,12 @@ export default function ReelsPage() {
       toast({ variant: 'destructive', title: 'Error', description: 'Database not ready.' });
       return;
     }
-    if (!reelNumber || !productUrl || !productImageUrl) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all fields, including the product image.' });
+    if (!reelNumber || !productUrl) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please fill in reel number and product URL.' });
+      return;
+    }
+     if (!productImageUrl) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please select an image.' });
       return;
     }
     
@@ -151,15 +139,41 @@ export default function ReelsPage() {
         toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid product URL.' });
         return;
     }
-     try {
-        new URL(productImageUrl);
-    } catch (_) {
-        toast({ variant: 'destructive', title: 'Invalid URL', description: 'The uploaded image URL is invalid.' });
+    
+    setIsSaving(true);
+    let finalImageUrl = currentReel?.productImageUrl || '';
+
+    // If a new image file was selected, upload it
+    if (imageFile) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        try {
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                finalImageUrl = result.data.url;
+            } else {
+                throw new Error(result.error?.message || 'Failed to upload image.');
+            }
+        } catch (error: any) {
+            toast({ variant: 'destructive', title: 'Upload Error', description: error.message || 'An unknown error occurred.' });
+            setIsSaving(false);
+            return;
+        }
+    }
+    
+    if (!finalImageUrl) {
+        toast({ variant: 'destructive', title: 'Image Error', description: 'Product image is required.' });
+        setIsSaving(false);
         return;
     }
 
-    setIsSaving(true);
-    
+
     const isEditing = !!currentReel?.id;
     const q = query(reelsCollection, where('reelNumber', '==', reelNumber));
     
@@ -194,7 +208,7 @@ export default function ReelsPage() {
        newReelId = docRef.id;
     }
 
-    const reelData = { id: newReelId, reelNumber, productUrl, productImageUrl };
+    const reelData = { id: newReelId, reelNumber, productUrl, productImageUrl: finalImageUrl };
 
     setDoc(docRef, reelData, { merge: true }).then(() => {
         toast({ title: 'Success', description: `Reel ${isEditing ? 'updated' : 'created'} successfully.` });
@@ -242,17 +256,17 @@ export default function ReelsPage() {
                 placeholder="Product URL"
                 value={productUrl}
                 onChange={(e) => setProductUrl(e.target.value)}
-                disabled={isSaving || isUploading}
+                disabled={isSaving}
                 className="text-base"
               />
                <div className="space-y-2">
-                <Button asChild variant="outline" className="w-full" disabled={isUploading || isSaving}>
+                <Button asChild variant="outline" className="w-full" disabled={isSaving}>
                   <label htmlFor="image-upload" className="cursor-pointer">
-                     {isUploading ? <Loader className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
-                     {isUploading ? 'Uploading...' : 'Upload Image'}
+                     <Upload className="mr-2 h-4 w-4" />
+                     Upload Image
                   </label>
                 </Button>
-                <Input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading || isSaving}/>
+                <Input id="image-upload" type="file" className="hidden" accept="image/*" onChange={handleImageSelection} disabled={isSaving}/>
                 {productImageUrl && (
                   <div className="relative aspect-square w-full max-w-[150px] mx-auto border rounded-md overflow-hidden">
                      <Image src={productImageUrl} alt="Product Preview" fill style={{objectFit: 'cover'}}/>
@@ -262,9 +276,9 @@ export default function ReelsPage() {
             </div>
             <DialogFooter className="sm:justify-end flex-row space-x-2">
                <DialogClose asChild>
-                <Button variant="outline" disabled={isSaving || isUploading}>Cancel</Button>
+                <Button variant="outline" disabled={isSaving}>Cancel</Button>
               </DialogClose>
-              <Button onClick={handleSave} disabled={isSaving || isUploading}>
+              <Button onClick={handleSave} disabled={isSaving}>
                 {(isSaving) && <Loader className="mr-2 h-4 w-4 animate-spin"/>}
                 {isSaving ? 'Saving...' : 'Save'}
               </Button>
