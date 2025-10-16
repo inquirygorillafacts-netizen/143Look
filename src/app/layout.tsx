@@ -8,7 +8,7 @@ import { Poppins, PT_Sans } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: '143look',
+  title: '143 Look',
   description: 'Find your fashion from Instagram Reels.',
 };
 

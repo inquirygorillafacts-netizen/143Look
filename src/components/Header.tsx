@@ -43,7 +43,7 @@ const Header = () => {
             <span className="font-poppins font-normal italic text-primary text-lg">
               3
             </span>
-            <span className="text-foreground">look</span>
+            <span className="text-foreground"> Look</span>
           </div>
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">

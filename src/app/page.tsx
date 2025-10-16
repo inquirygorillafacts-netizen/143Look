@@ -84,8 +84,8 @@ export default function Home() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: '143look पर यह स्टाइल देखें',
-          text: 'यह प्रोडक्ट मुझे 143look से मिला! आप भी ट्राई करें।',
+          title: '143 Look पर यह स्टाइल देखें',
+          text: 'यह प्रोडक्ट मुझे 143 Look से मिला! आप भी ट्राई करें।',
           url: link,
         });
       } catch (err) {
@@ -128,7 +128,7 @@ export default function Home() {
       <div className="z-10 flex flex-col items-center w-full">
         <Image
           src="/logo.png"
-          alt="143look Logo"
+          alt="143 Look Logo"
           width={128}
           height={128}
           className="mb-4"
