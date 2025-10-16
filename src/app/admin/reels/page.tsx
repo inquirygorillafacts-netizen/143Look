@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -38,10 +38,25 @@ export default function ReelsPage() {
   const { data: reels, isLoading } = useCollection<Reel>(reelsCollection);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [currentReel, setCurrentReel] = useState<Partial<Reel> | null>(null);
   const [reelNumber, setReelNumber] = useState('');
   const [productUrl, setProductUrl] = useState('');
   const { toast } = useToast();
+
+  const sortedReels = useMemo(() => {
+    if (!reels) return [];
+    // Sort reels numerically by reelNumber
+    return [...reels].sort((a, b) => parseInt(a.reelNumber, 10) - parseInt(b.reelNumber, 10));
+  }, [reels]);
+
+  const getNextReelNumber = useCallback(() => {
+    if (!sortedReels || sortedReels.length === 0) {
+      return '1';
+    }
+    const highestReelNumber = Math.max(...sortedReels.map(r => parseInt(r.reelNumber, 10)));
+    return (highestReelNumber + 1).toString();
+  }, [sortedReels]);
 
 
   const handleEdit = (reel: Reel) => {
@@ -53,7 +68,7 @@ export default function ReelsPage() {
 
   const handleAddNew = () => {
     setCurrentReel(null);
-    setReelNumber('');
+    setReelNumber(getNextReelNumber());
     setProductUrl('');
     setIsDialogOpen(true);
   };
@@ -68,28 +83,54 @@ export default function ReelsPage() {
   };
 
   const handleSave = async () => {
-    if (!firestore || !reelNumber || !productUrl) {
+    if (!firestore || !reelsCollection) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Database not ready.' });
+      return;
+    }
+    if (!reelNumber || !productUrl) {
       toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all fields.' });
       return;
     }
+
+    setIsSaving(true);
     
+    // Check for duplicate reelNumber unless we are editing the same reel
+    const isEditing = !!currentReel?.id;
+    const q = query(reelsCollection, where('reelNumber', '==', reelNumber));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        const isSameDoc = isEditing && querySnapshot.docs[0].id === currentReel.id;
+        if (!isSameDoc) {
+            toast({ variant: 'destructive', title: 'Error', description: `Reel number ${reelNumber} already exists.` });
+            setIsSaving(false);
+            return;
+        }
+    }
+
     let docRef;
-    if (currentReel?.id) {
-       docRef = doc(firestore, 'reels', currentReel.id);
+    let newReelId;
+    if (isEditing) {
+       docRef = doc(firestore, 'reels', currentReel!.id!);
+       newReelId = currentReel!.id!;
     } else {
-       // For new reels, we can use the reelNumber as the ID if it's unique
+       // For new reels, create a new doc reference
        docRef = doc(collection(firestore, 'reels'));
+       newReelId = docRef.id;
     }
 
     try {
-        await setDoc(docRef, { reelNumber, productUrl }, { merge: true });
-        toast({ title: 'Success', description: `Reel ${currentReel?.id ? 'updated' : 'created'} successfully.` });
+        await setDoc(docRef, { id: newReelId, reelNumber, productUrl }, { merge: true });
+        toast({ title: 'Success', description: `Reel ${isEditing ? 'updated' : 'created'} successfully.` });
         setIsDialogOpen(false);
     } catch(e) {
         console.error("Error saving reel: ", e);
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to save reel.' });
+    } finally {
+        setIsSaving(false);
     }
   };
+
 
   return (
     <div className="container mx-auto p-4">
@@ -97,7 +138,7 @@ export default function ReelsPage() {
         <h1 className="text-2xl font-bold">Manage Reels</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAddNew}>
+            <Button onClick={handleAddNew} disabled={isLoading}>
               <Plus className="mr-2 h-4 w-4" /> Add New Reel
             </Button>
           </DialogTrigger>
@@ -110,18 +151,23 @@ export default function ReelsPage() {
                 placeholder="Reel Number"
                 value={reelNumber}
                 onChange={(e) => setReelNumber(e.target.value)}
+                disabled={isSaving || !!currentReel} // Disable if saving or editing
               />
               <Input
                 placeholder="Product URL"
                 value={productUrl}
                 onChange={(e) => setProductUrl(e.target.value)}
+                disabled={isSaving}
               />
             </div>
             <DialogFooter>
                <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" disabled={isSaving}>Cancel</Button>
               </DialogClose>
-              <Button onClick={handleSave}>Save</Button>
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? <Loader className="mr-2 h-4 w-4 animate-spin"/> : null}
+                {isSaving ? 'Saving...' : 'Save'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -142,7 +188,7 @@ export default function ReelsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reels?.map((reel) => (
+              {sortedReels?.map((reel) => (
                 <TableRow key={reel.id}>
                   <TableCell>{reel.reelNumber}</TableCell>
                   <TableCell>
