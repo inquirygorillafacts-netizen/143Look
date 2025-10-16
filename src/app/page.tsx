@@ -83,6 +83,7 @@ export default function Home() {
     if (navigator.share) {
       navigator.share({
         title: 'Check out this look on 143look',
+        text: 'I found this product from a Reel using 143look! You can try it too.',
         url: link,
       });
     } else {
