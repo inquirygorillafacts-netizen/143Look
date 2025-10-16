@@ -1,3 +1,5 @@
+'use client';
+
 import { BarChart, CreditCard, TrendingUp, Users } from 'lucide-react';
 import {
   Card,
