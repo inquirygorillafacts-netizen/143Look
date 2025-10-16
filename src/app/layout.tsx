@@ -6,8 +6,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Aura.Creative',
-  description: 'Crafting digital experiences that captivate, inspire, and elevate.',
+  title: 'Cosmic Link Finder',
+  description: 'Find links from the cosmos.',
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -25,7 +25,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=PT+Sans:wght@700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Sans:wght@700&display=swap"
           rel="stylesheet"
         />
       </head>
