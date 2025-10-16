@@ -1,7 +1,9 @@
 const Footer = () => {
   return (
-    <footer className="text-center py-4 px-6 md:px-8 text-sm text-gray-500 bg-transparent absolute bottom-0 left-0 right-0 z-20">
-      <p>&copy; {new Date().getFullYear()} Cosmic Links. All rights reserved.</p>
+    <footer className="w-full py-6 px-4 md:px-8 z-10">
+      <div className="max-w-6xl mx-auto text-center text-sm text-neutral-500">
+        <p>&copy; {new Date().getFullYear()} Stellar Links. All rights reserved.</p>
+      </div>
     </footer>
   );
 };

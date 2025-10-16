@@ -1,86 +1,30 @@
 export const testimonials = [
   {
     quote:
-      'यह ऐप ब्रह्मांड की तरह ही अनंत और अद्भुत है। हर कोड एक नया तारा खोजने जैसा है।',
-    name: 'आकाशगंगा',
-    title: 'अंतरिक्ष यात्री',
+      "This service is out of this world. It's transformed how I manage my digital assets.",
+    name: "Alex Rivera",
+    title: "Digital Nomad",
   },
   {
     quote:
-      'कॉस्मिक लिंक फाइंडर के बिना, मेरे लिंक अंतरिक्ष में खो जाते थे। अब वे हमेशा मेरी उंगलियों पर हैं।',
-    name: 'तारा सिंह',
-    title: 'स्टारगेज़र',
+      "Without Stellar Links, my important URLs were lost in the cosmos. Now they are perfectly organized.",
+    name: "Samantha Jones",
+    title: "Content Creator",
   },
   {
-    quote: 'क्या शानदार डिज़ाइन है! ऐसा लगता है जैसे मैं सच में सितारों के बीच यात्रा कर रहा हूँ।',
-    name: 'सोफिया',
-    title: 'डिज़ाइनर',
-  },
-  {
-    quote:
-      'यह सिर्फ एक लिंक खोजक नहीं है, यह ब्रह्मांड के रहस्यों को खोलने का एक पोर्टल है।',
-    name: 'डॉ. विक्रम',
-    title: 'खगोल भौतिकीविद्',
-  },
-  {
-    quote: 'मेरे दोस्तों को शेयर करना बहुत आसान है। शेयर बटन एक सुपरनोवा की तरह काम करता है!',
-    name: 'नील',
-    title: 'सोशल मीडिया इन्फ्लुएंसर',
+    quote: "What a stunning design! It feels like I'm truly navigating the stars.",
+    name: "David Chen",
+    title: "UI/UX Designer",
   },
   {
     quote:
-      'कॉपी करने की सुविधा इतनी तेज़ है कि प्रकाश की गति भी शरमा जाए।',
-    name: 'रॉकेट',
-    title: 'इंजीनियर',
+      "It's not just a link finder; it's a portal to unlocking the universe's secrets.",
+    name: "Dr. Evelyn Reed",
+    title: "Astrophysicist",
   },
   {
-    quote:
-      'इस ऐप का उपयोग करना एक नए ग्रह की खोज करने जैसा है, हमेशा रोमांचक और आश्चर्य से भरा हुआ।',
-    name: 'ओरियन',
-    title: 'एडवेंचरर',
-  },
-  {
-    quote: 'सरल, सुंदर और शक्तिशाली। यह ऐप एक आदर्श नक्षत्र की तरह है।',
-    name: 'अरोड़ा',
-    title: 'कलाकार',
-  },
-  {
-    quote: 'मैंने कभी नहीं सोचा था कि लिंक खोजना इतना मज़ेदार हो सकता है। यह एक कॉस्मिक गेम है!',
-    name: 'लियो',
-    title: 'गेमर',
-  },
-  {
-    quote: 'इसका इंटरफ़ेस एक शांत रात के आकाश की तरह है - स्पष्ट और नेविगेट करने में आसान।',
-    name: 'डायना',
-    title: 'UX विशेषज्ञ',
-  },
-  {
-    quote:
-      'हर बार जब मैं एक कोड का उपयोग करता हूं, तो मुझे लगता है कि मैं एक शूटिंग स्टार पकड़ रहा हूं। जादुई!',
-    name: 'एस्ट्रा',
-    title: 'स्वप्नद्रष्टा',
-  },
-  {
-    quote:
-      'यह ऐप मेरे डिजिटल ब्रह्मांड का केंद्र बन गया है। इसके बिना मैं खो जाऊंगा।',
-    name: 'नोवा',
-    title: 'डेवलपर',
-  },
-  {
-    quote: 'सुरक्षित और विश्वसनीय। मेरा डेटा एक ब्लैक होल की तरह सुरक्षित महसूस होता है।',
-    name: 'कैसिओपिया',
-    title: 'सुरक्षा विश्लेषक',
-  },
-  {
-    quote:
-      'यह ऐप दिखाता है कि जब प्रौद्योगिकी और कल्पना मिलते हैं तो क्या संभव है।',
-    name: 'गैलीलियो',
-    title: 'आविष्कारक',
-  },
-  {
-    quote:
-      'ब्रह्मांडीय रूप से अच्छा! मैं हर किसी को इस अंतरिक्ष यात्रा पर जाने की सलाह देता हूं।',
-    name: 'हबल',
-    title: 'समीक्षक',
+    quote: "Sharing with my colleagues is a breeze. The share button works like a supernova!",
+    name: "Michael Brown",
+    title: "Project Manager",
   },
 ];

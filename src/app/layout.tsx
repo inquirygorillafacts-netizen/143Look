@@ -6,8 +6,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Cosmic Link Finder',
-  description: 'Find links from the cosmos.',
+  title: 'Stellar Links',
+  description: 'Navigate your digital universe with Stellar Links.',
 };
 
 export default function RootLayout({
@@ -25,19 +25,21 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Sans:wght@700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap"
           rel="stylesheet"
         />
       </head>
       <body
         className={cn(
-          'font-body antialiased h-full bg-background',
+          'font-sans antialiased h-full bg-background',
           'flex flex-col'
         )}
       >
-        <Header />
-        <main className="flex-grow flex flex-col">{children}</main>
-        <Footer />
+        <div className="relative flex flex-col h-full">
+          <Header />
+          <main className="flex-grow flex flex-col">{children}</main>
+          <Footer />
+        </div>
         <Toaster />
       </body>
     </html>
