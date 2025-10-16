@@ -192,12 +192,14 @@ export default function ReelsPage() {
                 value={reelNumber}
                 onChange={(e) => setReelNumber(e.target.value)}
                 disabled={isSaving || !!currentReel} 
+                className="text-base"
               />
               <Input
                 placeholder="Product URL"
                 value={productUrl}
                 onChange={(e) => setProductUrl(e.target.value)}
                 disabled={isSaving}
+                className="text-base"
               />
             </div>
             <DialogFooter className="flex-row justify-end space-x-2">
@@ -232,7 +234,7 @@ export default function ReelsPage() {
                 <TableRow key={reel.id}>
                   <TableCell>#{reel.reelNumber}</TableCell>
                   <TableCell>
-                    <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate block max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                    <a href={reel.productUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate block max-w-[150px] sm:max-w-xs md:max-w-sm lg:max-w-md">
                       {reel.productUrl}
                     </a>
                   </TableCell>

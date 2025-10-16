@@ -126,18 +126,18 @@ export default function Home() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tighter mb-2 text-foreground">
             Find Your Look.
           </h1>
-          <p className="text-sm text-muted-foreground max-w-sm mb-6 px-4">
+          <p className="text-sm md:text-base text-muted-foreground max-w-sm mb-6 px-4">
             Saw something you loved in a Reel? Enter the code below to get the direct link to the product.
           </p>
 
-          <div className="flex w-full max-w-[280px] items-center space-x-2 mb-4">
+          <div className="flex w-full max-w-sm items-center space-x-2 mb-4">
             <Input
               type="text"
               placeholder="Enter Reel Code..."
               value={code}
               onChange={(e) => setCode(e.target.value.trim())}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="h-10 text-sm border-border focus:ring-primary text-center"
+              className="h-10 text-sm md:text-base border-border focus:ring-primary text-center"
               disabled={isLoading}
             />
             <Button
@@ -178,7 +178,7 @@ export default function Home() {
         </div>
       </div>
        <div className="w-full flex flex-col items-center justify-center py-12 md:py-16 bg-secondary">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-foreground">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-foreground px-4">
           What Our Users Say
         </h2>
         <InfiniteMovingCards

@@ -7,7 +7,7 @@ import { LoginDialog } from '@/components/LoginDialog';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { getAuth, signOut } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
-import { Home } from 'lucide-react';
+import { Home, User as UserIcon, LogOut } from 'lucide-react';
 
 const Header = () => {
   const { user, isUserLoading } = useUser();
@@ -46,19 +46,22 @@ const Header = () => {
             <span className="text-foreground">look</span>
           </div>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           {user && owner && (
             <>
               {isAdminPage ? (
                 <Link href="/" passHref>
                   <Button variant="ghost" size="sm">
-                    <Home className="h-4 w-4 mr-1 md:mr-2"/> 
+                    <Home className="h-4 w-4 md:mr-2"/> 
                     <span className="hidden md:inline">Home</span>
                   </Button>
                 </Link>
               ) : (
                 <Link href="/admin" passHref>
-                  <Button variant="ghost" size="sm">Admin</Button>
+                  <Button variant="ghost" size="sm">
+                    <UserIcon className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:inline">Admin</span>
+                  </Button>
                 </Link>
               )}
             </>
@@ -68,8 +71,9 @@ const Header = () => {
               ...
             </Button>
           ) : user ? (
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Logout
+             <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Logout</span>
             </Button>
           ) : (
             <LoginDialog />
